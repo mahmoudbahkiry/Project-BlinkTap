@@ -34,7 +34,7 @@ public class RegisterManager : MonoBehaviour
 
     private IEnumerator RegisterRequest(string email, string password)
     {
-        string url = "http://yourserver.com/register";
+        string url = "http://192.168.1.11/register";
 
         string jsonData = JsonUtility.ToJson(new AuthData(email, password));
         UnityWebRequest request = new UnityWebRequest(url, "POST");

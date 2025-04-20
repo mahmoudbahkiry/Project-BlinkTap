@@ -34,7 +34,7 @@ public class LoginManager : MonoBehaviour
 
     private IEnumerator LoginRequest(string email, string password)
     {
-        string url = "http://yourserver.com/login";
+        string url = "http://192.168.1.11/login";
 
         string jsonData = JsonUtility.ToJson(new AuthData(email, password));
         UnityWebRequest request = new UnityWebRequest(url, "POST");
