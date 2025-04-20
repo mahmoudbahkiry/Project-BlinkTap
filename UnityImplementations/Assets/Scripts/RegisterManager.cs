@@ -24,6 +24,7 @@ public class RegisterManager : MonoBehaviour
 
     private void OnRegisterButtonClicked()
     {
+        registerPanel.SetActive(false);
         loadingPanel.SetActive(true);
 
         string email = registerEmailInput.text;
@@ -34,7 +35,7 @@ public class RegisterManager : MonoBehaviour
 
     private IEnumerator RegisterRequest(string email, string password)
     {
-        string url = "http://192.168.1.11/register";
+        string url = "http://localhost:3000/register";
 
         string jsonData = JsonUtility.ToJson(new AuthData(email, password));
         UnityWebRequest request = new UnityWebRequest(url, "POST");

@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine.Networking;
 using System.Collections;
 using System.Text;
+using UnityEngine.SceneManagement;
 
 public class LoginManager : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class LoginManager : MonoBehaviour
     public GameObject loadingPanel;
     public GameObject loginPanel;
     public GameObject registerPanel;
+    public string mainMenuSceneName = "Main menu";
 
     private void Start()
     {
@@ -24,6 +26,7 @@ public class LoginManager : MonoBehaviour
 
     private void OnLoginButtonClicked()
     {
+        loginPanel.SetActive(false);
         loadingPanel.SetActive(true);
 
         string email = emailInput.text;
@@ -34,7 +37,7 @@ public class LoginManager : MonoBehaviour
 
     private IEnumerator LoginRequest(string email, string password)
     {
-        string url = "http://192.168.1.11/login";
+        string url = "http://localhost:3000/login";
 
         string jsonData = JsonUtility.ToJson(new AuthData(email, password));
         UnityWebRequest request = new UnityWebRequest(url, "POST");
@@ -53,6 +56,9 @@ public class LoginManager : MonoBehaviour
             // You can store the token here if you return it
             Debug.Log("Login success: " + request.downloadHandler.text);
             loginPanel.SetActive(false);
+
+            // Load the main menu scene
+            SceneManager.LoadScene(mainMenuSceneName);
         }
         else
         {
