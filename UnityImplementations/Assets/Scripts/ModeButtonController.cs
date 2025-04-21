@@ -47,6 +47,29 @@ public class ModeButtonController : MonoBehaviour
         if (menuManager == null)
             menuManager = FindObjectOfType<MainMenuManager>();
 
+        // Auto-detect multiplayer button based on name
+        string objName = gameObject.name.ToLower();
+        if (objName.Contains("multiplayer"))
+        {
+            // Automatically configure for multiplayer mode
+            modeType = ModeType.Multiplayer;
+            modeName = "Multiplayer";
+            modeDescription = "Compete with others";
+
+            // Register with menu manager
+            if (menuManager != null)
+            {
+                menuManager.multiplayerButton = GetComponent<Button>();
+            }
+        }
+        else if (objName.Contains("solo"))
+        {
+            // Ensure solo mode is set correctly
+            modeType = ModeType.Solo;
+            modeName = "Solo";
+            modeDescription = "Train your reflexes";
+        }
+
         // Apply mode configuration
         ApplyModeSettings();
 
@@ -90,6 +113,9 @@ public class ModeButtonController : MonoBehaviour
         {
             // Call the LoadGameMode method on the MainMenuManager
             Debug.Log("Mode button clicked: " + modeName);
+
+            // Call the appropriate method on the menu manager with the correct mode
+            menuManager.LoadGameMode(modeName);
         }
     }
 

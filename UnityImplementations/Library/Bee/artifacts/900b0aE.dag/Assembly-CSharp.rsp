@@ -397,6 +397,7 @@
 "Assets/Scripts/RegisterManager.cs"
 "Assets/Scripts/StatsPanelController.cs"
 "Assets/Scripts/UIElementStyler.cs"
+"Assets/Scripts/UIVisibilityEnforcer.cs"
 "Assets/TextMesh Pro/Examples & Extras/Scripts/Benchmark01.cs"
 "Assets/TextMesh Pro/Examples & Extras/Scripts/Benchmark01_UGUI.cs"
 "Assets/TextMesh Pro/Examples & Extras/Scripts/Benchmark02.cs"

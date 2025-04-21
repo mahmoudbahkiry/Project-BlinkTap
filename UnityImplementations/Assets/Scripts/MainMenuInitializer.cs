@@ -18,7 +18,8 @@ public class MainMenuInitializer : MonoBehaviour
     [SerializeField] private Transform challengeContainer;
 
     [Header("Prefabs")]
-    [SerializeField] private GameObject modeButtonPrefab;
+    [SerializeField] private GameObject soloModeButtonPrefab;
+    [SerializeField] private GameObject multiplayerModeButtonPrefab;
     [SerializeField] private GameObject statsPanelPrefab;
     [SerializeField] private GameObject navButtonPrefab;
     [SerializeField] private GameObject challengePanelPrefab;
@@ -50,6 +51,10 @@ public class MainMenuInitializer : MonoBehaviour
     [Header("Profile Panel")]
     [SerializeField] private GameObject profilePanelPrefab;
     [SerializeField] private Transform canvasTransform; // Reference to the canvas for instantiating the profile panel
+
+    // Game mode buttons
+    private Button soloModeButton;
+    private Button multiplayerModeButton;
 
     void Start()
     {
@@ -83,11 +88,39 @@ public class MainMenuInitializer : MonoBehaviour
         SetupNavBar();
         SetupChallengePanel();
         SetupProfilePanel();
+
+        // Set game mode button references in menu manager
+        if (menuManager != null)
+        {
+            // Find and configure the multiplayer button in the scene
+            GameObject multiplayerButtonObj = GameObject.Find("MultiplayerButton");
+            if (multiplayerButtonObj != null)
+            {
+                ModeButtonController controller = multiplayerButtonObj.GetComponent<ModeButtonController>();
+                if (controller != null)
+                {
+                    // Make sure it's set to Multiplayer mode
+                    controller.Configure(ModeType.Multiplayer, "Multiplayer", "Compete with others", null);
+
+                    // Ensure the button is active
+                    multiplayerButtonObj.SetActive(true);
+
+                    // Get the button component and store it
+                    multiplayerModeButton = multiplayerButtonObj.GetComponent<Button>();
+
+                    // Set it in the menu manager
+                    if (menuManager != null && multiplayerModeButton != null)
+                    {
+                        menuManager.SetMultiplayerButton(multiplayerModeButton);
+                    }
+                }
+            }
+        }
     }
 
     void SetupGameModes()
     {
-        if (gameModeContainer == null || modeButtonPrefab == null)
+        if (gameModeContainer == null || soloModeButtonPrefab == null || multiplayerModeButtonPrefab == null)
             return;
 
         // Clear existing content
@@ -97,18 +130,32 @@ public class MainMenuInitializer : MonoBehaviour
         }
 
         // Create Solo Mode Button
-        CreateModeButton(
+        GameObject soloButtonObj = Instantiate(soloModeButtonPrefab, gameModeContainer);
+        ConfigureModeButton(
+            soloButtonObj,
             ModeType.Solo,
             "Solo",
             "Train your reflexes",
             soloModeIcon);
 
         // Create Multiplayer Mode Button
-        CreateModeButton(
+        GameObject multiplayerButtonObj = Instantiate(multiplayerModeButtonPrefab, gameModeContainer);
+        ConfigureModeButton(
+            multiplayerButtonObj,
             ModeType.Multiplayer,
             "Multiplayer",
             "Battle friends",
             multiplayerModeIcon);
+
+        // Store reference to multiplayer button in menu manager if available
+        if (menuManager != null && multiplayerButtonObj != null)
+        {
+            Button mpButton = multiplayerButtonObj.GetComponent<Button>();
+            if (mpButton != null)
+            {
+                menuManager.SetMultiplayerButton(mpButton);
+            }
+        }
     }
 
     void SetupStats()
@@ -203,10 +250,9 @@ public class MainMenuInitializer : MonoBehaviour
         profilePanel.SetActive(false);
     }
 
-    // Helper method to create mode buttons
-    private void CreateModeButton(ModeType modeType, string modeName, string description, Sprite icon)
+    // Helper method to configure mode buttons
+    private void ConfigureModeButton(GameObject buttonObj, ModeType modeType, string modeName, string description, Sprite icon)
     {
-        GameObject buttonObj = Instantiate(modeButtonPrefab, gameModeContainer);
         ModeButtonController controller = buttonObj.GetComponent<ModeButtonController>();
 
         if (controller != null)

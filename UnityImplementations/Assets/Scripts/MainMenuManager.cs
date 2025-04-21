@@ -21,7 +21,7 @@ public class MainMenuManager : MonoBehaviour
 
     [Header("Game Modes")]
     [SerializeField] private Button soloButton;
-    [SerializeField] private Button multiplayerButton;
+    public Button multiplayerButton;
 
     [Header("Navigation")]
     [SerializeField] private Button homeButton;
@@ -34,6 +34,9 @@ public class MainMenuManager : MonoBehaviour
     public TextMeshProUGUI emailText;
     public TMP_Dropdown professionDropdown;
     public Button saveProfileButton;
+
+    [Header("Main Content")]
+    public GameObject contentPanel; // Reference to the main content panel
 
     // Current active tab
     private string currentTab = "Home";
@@ -81,6 +84,12 @@ public class MainMenuManager : MonoBehaviour
 
         // Initialize tabs
         SwitchTab("Home");
+
+        // Ensure multiplayer button is visible - adding extra redundancy
+        if (multiplayerButton != null)
+        {
+            multiplayerButton.gameObject.SetActive(true);
+        }
     }
 
     void SetupUserInfo()
@@ -114,10 +123,25 @@ public class MainMenuManager : MonoBehaviour
     {
         // Game mode buttons
         if (soloButton != null)
+        {
             soloButton.onClick.AddListener(() => LoadGameMode("Solo"));
+            // Make sure the solo button is active and properly configured
+            soloButton.gameObject.SetActive(true);
+        }
 
         if (multiplayerButton != null)
+        {
             multiplayerButton.onClick.AddListener(() => LoadGameMode("Multiplayer"));
+            // Double ensure the button is active
+            multiplayerButton.gameObject.SetActive(true);
+
+            // Add component if missing
+            ModeButtonController controller = multiplayerButton.GetComponent<ModeButtonController>();
+            if (controller != null)
+            {
+                controller.Configure(ModeType.Multiplayer, "Multiplayer", "Compete with others", null);
+            }
+        }
 
         // Navigation buttons
         if (homeButton != null)
@@ -170,7 +194,7 @@ public class MainMenuManager : MonoBehaviour
         // SceneManager.LoadScene("GameScene");
     }
 
-    void LoadGameMode(string mode)
+    public void LoadGameMode(string mode)
     {
         Debug.Log("Loading game mode: " + mode);
         // Load the appropriate game mode scene
@@ -185,15 +209,28 @@ public class MainMenuManager : MonoBehaviour
         currentTab = tab;
 
         // Show/hide profile panel based on tab
+        bool isProfileTab = (tab == "Profile");
+
         if (profilePanel != null)
         {
-            bool showProfile = (tab == "Profile");
-            profilePanel.SetActive(showProfile);
+            profilePanel.SetActive(isProfileTab);
 
             // If showing the profile panel, update the information
-            if (showProfile)
+            if (isProfileTab)
             {
                 SetupProfilePanel();
+            }
+        }
+
+        // Show/hide main content panel (inverse of profile panel visibility)
+        if (contentPanel != null)
+        {
+            contentPanel.SetActive(!isProfileTab);
+
+            // Ensure the multiplayer button is visible when content panel is active
+            if (!isProfileTab && multiplayerButton != null)
+            {
+                multiplayerButton.gameObject.SetActive(true);
             }
         }
 
@@ -251,5 +288,16 @@ public class MainMenuManager : MonoBehaviour
         personalBest = newReactionTime;
         // Update UI
         SetupPlayerStats();
+    }
+
+    // Public method to set the multiplayer button reference
+    public void SetMultiplayerButton(Button button)
+    {
+        if (button != null)
+        {
+            multiplayerButton = button;
+            multiplayerButton.onClick.AddListener(() => LoadGameMode("Multiplayer"));
+            multiplayerButton.gameObject.SetActive(true);
+        }
     }
 }
