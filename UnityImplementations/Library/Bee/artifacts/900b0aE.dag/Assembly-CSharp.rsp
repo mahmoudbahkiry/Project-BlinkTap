@@ -396,6 +396,7 @@
 "Assets/Scripts/ProfilePanelController.cs"
 "Assets/Scripts/RegisterManager.cs"
 "Assets/Scripts/StatsPanelController.cs"
+"Assets/Scripts/TestServerConnection.cs"
 "Assets/Scripts/UIElementStyler.cs"
 "Assets/Scripts/UIVisibilityEnforcer.cs"
 "Assets/TextMesh Pro/Examples & Extras/Scripts/Benchmark01.cs"
