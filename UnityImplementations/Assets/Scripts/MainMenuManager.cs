@@ -52,26 +52,26 @@ public class MainMenuManager : MonoBehaviour
     // List of professions
     private readonly string[] professions = new string[]
     {
-        "Boxers",
-        "Mixed Martial Artists (MMA)",
-        "Fencers",
-        "Sprinters (Track & Field)",
-        "Goalkeepers (Football/Soccer, Handball, Hockey)",
-        "Table Tennis Players",
-        "Tennis Players",
-        "Baseball Batters",
-        "Cricketers (especially batsmen and wicketkeepers)",
-        "Formula 1 Drivers / Race Car Drivers",
-        "Basketball Players",
-        "Football Players (American)",
-        "Hockey Players (Ice & Field)",
-        "Esports Athletes",
-        "Badminton Players",
-        "Volleyball Players",
-        "Martial Artists (Karate, Taekwondo, etc.)",
-        "Skiers and Snowboarders (especially downhill)",
-        "Gymnasts",
-        "Rugby Players"
+        "Boxer",
+        "Mixed Martial Artist (MMA)",
+        "Fencer",
+        "Sprinter (Track & Field)",
+        "Goalkeeper (Football/Soccer, Handball, Hockey)",
+        "Table Tennis Player",
+        "Tennis Player",
+        "Baseball Batter",
+        "Cricketer",
+        "Formula 1 Driver / Race Car Driver",
+        "Basketball Player",
+        "Football Player (American)",
+        "Hockey Player (Ice & Field)",
+        "Esports Athlete",
+        "Badminton Player",
+        "Volleyball Player",
+        "Martial Artist",
+        "Skier and Snowboarder",
+        "Gymnast",
+        "Rugby Player"
     };
 
     void Start()

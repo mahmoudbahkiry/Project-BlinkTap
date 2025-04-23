@@ -727,7 +727,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Password\u200B"
+  m_text: "********\u200B"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -3106,6 +3106,7 @@ MonoBehaviour:
   loadingPanel: {fileID: 385457570}
   loginPanel: {fileID: 591772669}
   registerPanel: {fileID: 1464891302}
+  mainMenuSceneName: Main menu
 --- !u!4 &1133961114
 Transform:
   m_ObjectHideFlags: 0
@@ -3890,6 +3891,8 @@ MonoBehaviour:
   loadingPanel: {fileID: 385457570}
   registerPanel: {fileID: 1464891302}
   loginPanel: {fileID: 591772669}
+  mainMenuSceneName: Main menu
+  autoLoginAfterRegister: 1
 --- !u!4 &1366593810
 Transform:
   m_ObjectHideFlags: 0
