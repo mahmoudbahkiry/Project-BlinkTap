@@ -68,6 +68,12 @@ public class ModeButtonController : MonoBehaviour
             modeType = ModeType.Solo;
             modeName = "Solo";
             modeDescription = "Train your reflexes";
+
+            // Register with menu manager
+            if (menuManager != null)
+            {
+                menuManager.SetSoloButton(GetComponent<Button>());
+            }
         }
 
         // Apply mode configuration

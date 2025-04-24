@@ -20,7 +20,7 @@ public class ChallengePanelController : MonoBehaviour
 
     [Header("Challenge Data")]
     [SerializeField] private string challengeTitle = "Today's Challenge";
-    [SerializeField] private int personalBest = 198;
+    [SerializeField] private int personalBest = 0; // Default to 0 for new users
     private bool isFetchingBestScore = false;
 
     private void Awake()
@@ -136,6 +136,9 @@ public class ChallengePanelController : MonoBehaviour
             else
             {
                 Debug.Log("ChallengePanelController: No best score found or not logged in");
+                // Set personalBest to 0 to indicate no best score
+                personalBest = 0;
+                StartCoroutine(UpdateTextNextFrame());
             }
         });
     }
@@ -185,21 +188,35 @@ public class ChallengePanelController : MonoBehaviour
     {
         if (bestScoreText != null)
         {
-            bestScoreText.text = "Beat your personal best: " + personalBest + "ms";
+            // Check if this is a new user with no best score
+            if (personalBest <= 0)
+            {
+                // Display message for new users
+                bestScoreText.text = "No personal best yet, play now!";
 
-            // Set the font size to make it larger
-            bestScoreText.fontSize = 30f; // Adjust this value to your preference
+                // Set the font size to make it larger
+                bestScoreText.fontSize = 30f;
 
-            // Make it bold for better visibility
-            bestScoreText.fontStyle = TMPro.FontStyles.Bold;
+                // Make it bold for better visibility
+                bestScoreText.fontStyle = TMPro.FontStyles.Bold;
 
-            // Optional: Add color highlighting for the score itself
-            bestScoreText.text = $"Beat your personal best: <color=#00CCFF>{personalBest}</color>ms";
+                // Optional: Add color to make the call to action stand out
+                bestScoreText.text = "No personal best yet, <color=#00CCFF>play now!</color>";
+            }
+            else
+            {
+                // For returning users with a best score
+                bestScoreText.text = $"Beat your personal best: <color=#00CCFF>{personalBest}</color>ms";
 
-            // Optional: Add a slight character spacing for better readability
+                // Set the font size to make it larger
+                bestScoreText.fontSize = 30f;
+
+                // Make it bold for better visibility
+                bestScoreText.fontStyle = TMPro.FontStyles.Bold;
+            }
+
+            // Common settings for both cases
             bestScoreText.characterSpacing = 1f;
-
-            // Optional: Set alignment to center for better appearance
             bestScoreText.alignment = TMPro.TextAlignmentOptions.Center;
 
             Debug.Log($"ChallengePanelController: Updated best score text: {bestScoreText.text}, Font size: {bestScoreText.fontSize}");

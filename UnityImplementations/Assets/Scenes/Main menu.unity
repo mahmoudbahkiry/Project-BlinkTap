@@ -964,7 +964,7 @@ MonoBehaviour:
   personalBestText: {fileID: 272214025}
   startButton: {fileID: 1069705115}
   reactionTimeText: {fileID: 1466402974}
-  reactionTimeChangeText: {fileID: 979883195}
+  reactionTimeChangeText: {fileID: 0}
   soloButton: {fileID: 739059409}
   multiplayerButton: {fileID: 1047265704}
   homeButton: {fileID: 1035817197}
@@ -1403,17 +1403,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &979883195 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4108462052603915087, guid: be40407d1f90d4236857a0e90b0178b6, type: 3}
-  m_PrefabInstance: {fileID: 1169644845922984100}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!224 &1035817196 stripped
@@ -1990,6 +1979,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7b743370ac3e4ec2a1668f5455a8ef8a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1759082997 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1303477590592601203, guid: be40407d1f90d4236857a0e90b0178b6, type: 3}
+  m_PrefabInstance: {fileID: 1169644845922984100}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1879512996
@@ -2921,11 +2921,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 888312833330786984, guid: be40407d1f90d4236857a0e90b0178b6, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0.000061035156
+      value: -338.08997
       objectReference: {fileID: 0}
     - target: {fileID: 888312833330786984, guid: be40407d1f90d4236857a0e90b0178b6, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: 0.0008544922
       objectReference: {fileID: 0}
     - target: {fileID: 888312833330786984, guid: be40407d1f90d4236857a0e90b0178b6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -2939,12 +2939,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8514674259972863442, guid: be40407d1f90d4236857a0e90b0178b6, type: 3}
+      propertyPath: titleText
+      value: 
+      objectReference: {fileID: 1759082997}
+    - target: {fileID: 8514674259972863442, guid: be40407d1f90d4236857a0e90b0178b6, type: 3}
+      propertyPath: valueText
+      value: 
+      objectReference: {fileID: 1466402974}
+    - target: {fileID: 8514674259972863442, guid: be40407d1f90d4236857a0e90b0178b6, type: 3}
+      propertyPath: changeText
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 8715203940136027427, guid: be40407d1f90d4236857a0e90b0178b6, type: 3}
       propertyPath: m_Name
       value: ReactionTimePanel
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 7163844325944999583, guid: be40407d1f90d4236857a0e90b0178b6, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: be40407d1f90d4236857a0e90b0178b6, type: 3}
@@ -3164,6 +3177,10 @@ PrefabInstance:
     - target: {fileID: 7070186565568393069, guid: 43775e84079fd40b8a89bf7405dbbeb3, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7634693734301771659, guid: 43775e84079fd40b8a89bf7405dbbeb3, type: 3}
+      propertyPath: m_text
+      value: No personal best yet!
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

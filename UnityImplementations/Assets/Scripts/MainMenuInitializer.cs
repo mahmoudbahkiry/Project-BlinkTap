@@ -198,24 +198,131 @@ public class MainMenuInitializer : MonoBehaviour
 
     void SetupStats()
     {
-        if (statsContainer == null || statsPanelPrefab == null)
+        if (statsContainer == null)
             return;
 
-        // Clear existing content
-        foreach (Transform child in statsContainer)
+        // Don't clear or instantiate anything, just find the existing panel
+        Transform existingPanelTransform = statsContainer.Find("ReactionTimePanel");
+        if (existingPanelTransform == null)
         {
-            Destroy(child.gameObject);
+            Debug.LogError("MainMenuInitializer: Could not find ReactionTimePanel in the scene. Please add it manually in the editor.");
+            return;
         }
 
-        // Create Reaction Time Stats
-        GameObject reactionTimePanel = Instantiate(statsPanelPrefab, statsContainer);
-        StatsPanelController reactionTimeController = reactionTimePanel.GetComponent<StatsPanelController>();
-        if (reactionTimeController != null)
+        StatsPanelController statsPanelController = existingPanelTransform.GetComponent<StatsPanelController>();
+        if (statsPanelController == null)
         {
-            reactionTimeController.UpdateValue(
-                reactionTime + "ms",
-                "↑ " + reactionTimeChange + "ms");
+            Debug.LogError("MainMenuInitializer: ReactionTimePanel found but missing StatsPanelController component.");
+            return;
         }
+
+        Debug.Log("MainMenuInitializer: Using existing ReactionTimePanel");
+
+        // Check if we have saved reaction time data
+        if (ReactionTimeManager.HasReactionTimeData())
+        {
+            // Use the most recent average reaction time
+            float lastAvgTime = ReactionTimeManager.GetLastAverageReactionTime();
+            int roundedAvgTime = Mathf.RoundToInt(lastAvgTime);
+
+            // Try regular update first
+            statsPanelController.UpdateValue(
+                roundedAvgTime + "ms",
+                "↑ " + reactionTimeChange + "ms");
+
+            // Also try direct update as a fallback
+            statsPanelController.UpdateValueTextDirectly(roundedAvgTime + "ms");
+
+            Debug.Log($"MainMenuInitializer: Displaying cached reaction time: {roundedAvgTime}ms");
+        }
+        else
+        {
+            // No reaction time data yet
+            // Try regular update first
+            statsPanelController.UpdateValue(
+                "No reaction time yet",
+                "");
+
+            // Also try direct update as a fallback
+            statsPanelController.UpdateValueTextDirectly("No reaction time yet");
+
+            Debug.Log("MainMenuInitializer: No cached reaction time data available");
+        }
+
+        // Then fetch the most recent data from Firebase
+        FirebaseManager firebaseManager = FindObjectOfType<FirebaseManager>();
+        if (firebaseManager == null)
+        {
+            // Create a new FirebaseManager if one doesn't exist
+            GameObject firebaseManagerObj = new GameObject("FirebaseManager");
+            firebaseManager = firebaseManagerObj.AddComponent<FirebaseManager>();
+            DontDestroyOnLoad(firebaseManagerObj);
+
+            // Try to set user email from PlayerPrefs
+            if (PlayerPrefs.HasKey("UserEmail"))
+            {
+                string email = PlayerPrefs.GetString("UserEmail");
+                firebaseManager.SetUserEmail(email);
+                Debug.Log($"MainMenuInitializer: Set FirebaseManager email to: {email}");
+            }
+            else
+            {
+                Debug.LogError("MainMenuInitializer: No UserEmail found in PlayerPrefs");
+            }
+        }
+
+        // First check if we can connect to the server
+        firebaseManager.CheckServerConnection((isConnected) =>
+        {
+            if (isConnected)
+            {
+                Debug.Log("MainMenuInitializer: Server connection successful, fetching most recent reaction time");
+
+                // Get the most recent reaction time
+                firebaseManager.GetMostRecentReactionTime((reactionTime) =>
+                {
+                    if (reactionTime > 0)
+                    {
+                        int roundedAvgTime = Mathf.RoundToInt(reactionTime);
+
+                        // Update the stats panel with the fetched value
+                        statsPanelController.UpdateValue(
+                            roundedAvgTime + "ms",
+                            "↑ " + reactionTimeChange + "ms");
+
+                        // Also try direct update as a fallback
+                        statsPanelController.UpdateValueTextDirectly(roundedAvgTime + "ms");
+
+                        Debug.Log($"MainMenuInitializer: Updated reaction time from Firebase: {roundedAvgTime}ms");
+
+                        // Also update the menu manager if it exists
+                        if (menuManager != null)
+                        {
+                            menuManager.UpdateStats(roundedAvgTime);
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning("MainMenuInitializer: Server returned 0 or negative reaction time");
+
+                        if (!ReactionTimeManager.HasReactionTimeData())
+                        {
+                            // No data from Firebase, and no local data
+                            statsPanelController.UpdateValue("No reaction time yet", "");
+
+                            // Also try direct update as a fallback
+                            statsPanelController.UpdateValueTextDirectly("No reaction time yet");
+
+                            Debug.Log("MainMenuInitializer: Displaying 'No reaction time yet'");
+                        }
+                    }
+                });
+            }
+            else
+            {
+                Debug.LogError("MainMenuInitializer: Could not connect to server, using cached data only");
+            }
+        });
     }
 
     void SetupNavBar()

@@ -342,6 +342,68 @@ app.get('/best-score', async (req, res) => {
   }
 });
 
+// New endpoint to get the most recent reaction time for a user
+app.get('/most-recent-score', async (req, res) => {
+  const { email } = req.query;
+  
+  if (!email) {
+    console.error('GET /most-recent-score - Email is required but was not provided');
+    return res.status(400).json({ error: 'Email is required' });
+  }
+  
+  console.log(`GET /most-recent-score - Looking up most recent score for email: ${email}`);
+  
+  try {
+    // Get a reference to the scores collection and the user's document
+    const scoresRef = db.collection('scores');
+    const userScoreRef = scoresRef.doc(email);
+    
+    // Get the current document
+    const doc = await userScoreRef.get();
+    
+    if (!doc.exists) {
+      // No scores found for this user
+      console.log(`No scores found for email: ${email}`);
+      return res.status(200).json({ recentScore: 0 });
+    }
+    
+    // Get user data and test results
+    const userData = doc.data();
+    const testResults = userData.testResults || [];
+    
+    if (testResults.length === 0) {
+      console.log(`No test results found for email: ${email}`);
+      return res.status(200).json({ recentScore: 0 });
+    }
+    
+    // Find the most recent test result by timestamp
+    // First try with actual timestamp objects
+    let mostRecentResult = testResults[0];
+    let mostRecentTimestamp = mostRecentResult.timestamp;
+    
+    for (let i = 1; i < testResults.length; i++) {
+      const result = testResults[i];
+      const timestamp = result.timestamp;
+      
+      // Convert string timestamps to Date objects for comparison if necessary
+      const currentTimestamp = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
+      const currentMostRecent = typeof mostRecentTimestamp === 'string' ? new Date(mostRecentTimestamp) : mostRecentTimestamp;
+      
+      if (currentTimestamp > currentMostRecent) {
+        mostRecentResult = result;
+        mostRecentTimestamp = timestamp;
+      }
+    }
+    
+    console.log(`Most recent score for ${email}: ${mostRecentResult.averageReactionTime}ms`);
+    return res.status(200).json({ recentScore: Math.round(mostRecentResult.averageReactionTime) });
+  } catch (error) {
+    console.error('Error getting most recent score:', error);
+    console.error(error.stack);
+    return res.status(500).json({ error: 'Failed to get most recent score', details: error.message });
+  }
+});
+
 // Start the server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);

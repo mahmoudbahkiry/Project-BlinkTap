@@ -99,6 +99,72 @@ public class MainMenuManager : MonoBehaviour
         }
     }
 
+    // This will run every time the scene is loaded or the GameObject becomes active
+    void OnEnable()
+    {
+        Debug.Log("MainMenuManager: OnEnable called - refreshing stats");
+
+        // First refresh stats with local data
+        SetupPlayerStats();
+        SetupChallengeSection();
+
+        // Then fetch the latest data from Firebase
+        FirebaseManager firebaseManager = FindObjectOfType<FirebaseManager>();
+        if (firebaseManager == null)
+        {
+            // Create a new FirebaseManager if one doesn't exist
+            GameObject firebaseManagerObj = new GameObject("FirebaseManager");
+            firebaseManager = firebaseManagerObj.AddComponent<FirebaseManager>();
+            DontDestroyOnLoad(firebaseManagerObj);
+
+            Debug.Log("MainMenuManager: Created new FirebaseManager instance");
+
+            // Try to set user email from PlayerPrefs
+            if (PlayerPrefs.HasKey("UserEmail"))
+            {
+                string email = PlayerPrefs.GetString("UserEmail");
+                firebaseManager.SetUserEmail(email);
+                Debug.Log($"MainMenuManager: Set Firebase email to {email}");
+            }
+            else
+            {
+                Debug.LogError("MainMenuManager: No UserEmail found in PlayerPrefs!");
+                // Cannot proceed with Firebase operations without an email
+                return;
+            }
+        }
+
+        // Check if the server is reachable before attempting to fetch data
+        firebaseManager.CheckServerConnection((isConnected) =>
+        {
+            if (isConnected)
+            {
+                Debug.Log("MainMenuManager: Server connection successful, fetching most recent reaction time");
+
+                // Get the most recent reaction time
+                firebaseManager.GetMostRecentReactionTime((reactionTime) =>
+                {
+                    if (reactionTime > 0)
+                    {
+                        Debug.Log($"MainMenuManager: Got reaction time from server: {reactionTime}ms");
+
+                        // Refresh the UI with the updated data
+                        SetupPlayerStats();
+                        SetupChallengeSection();
+                    }
+                    else
+                    {
+                        Debug.LogWarning("MainMenuManager: Server returned 0 or negative reaction time");
+                    }
+                });
+            }
+            else
+            {
+                Debug.LogError("MainMenuManager: Could not connect to server, using cached data only");
+            }
+        });
+    }
+
     void SetupUserInfo()
     {
         if (welcomeText != null)
@@ -111,7 +177,18 @@ public class MainMenuManager : MonoBehaviour
     void SetupChallengeSection()
     {
         if (personalBestText != null)
-            personalBestText.text = "Beat your personal best: " + personalBest + "ms";
+        {
+            if (ReactionTimeManager.HasReactionTimeData())
+            {
+                float lastAvgTime = ReactionTimeManager.GetLastAverageReactionTime();
+                int roundedAvgTime = Mathf.RoundToInt(lastAvgTime);
+                personalBestText.text = "Beat your personal best: " + roundedAvgTime + "ms";
+            }
+            else
+            {
+                personalBestText.text = "Record your first reaction time!";
+            }
+        }
 
         if (startButton != null)
             startButton.onClick.AddListener(StartChallenge);
@@ -119,11 +196,28 @@ public class MainMenuManager : MonoBehaviour
 
     void SetupPlayerStats()
     {
-        if (reactionTimeText != null)
-            reactionTimeText.text = personalBest + "ms";
+        // Check if we have saved reaction time data
+        if (ReactionTimeManager.HasReactionTimeData())
+        {
+            // Use the most recent average reaction time
+            float lastAvgTime = ReactionTimeManager.GetLastAverageReactionTime();
+            int roundedAvgTime = Mathf.RoundToInt(lastAvgTime);
 
-        if (reactionTimeChangeText != null)
-            reactionTimeChangeText.text = "↑ " + reactionTimeChange + "ms";
+            if (reactionTimeText != null)
+                reactionTimeText.text = roundedAvgTime + "ms";
+
+            if (reactionTimeChangeText != null)
+                reactionTimeChangeText.text = "↑ " + reactionTimeChange + "ms";
+        }
+        else
+        {
+            // No reaction time data yet
+            if (reactionTimeText != null)
+                reactionTimeText.text = "No reaction time yet";
+
+            if (reactionTimeChangeText != null)
+                reactionTimeChangeText.text = "";
+        }
     }
 
     void SetupButtons()
@@ -255,8 +349,28 @@ public class MainMenuManager : MonoBehaviour
     public void LoadGameMode(string mode)
     {
         Debug.Log("Loading game mode: " + mode);
+
         // Load the appropriate game mode scene
-        // SceneManager.LoadScene(mode + "Scene");
+        if (mode == "Solo")
+        {
+            try
+            {
+                SceneManager.LoadScene("Solo");
+                Debug.Log("Loading Solo scene");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError("Failed to load Solo scene. Make sure it's added to Build Settings! Error: " + e.Message);
+                Debug.LogWarning("IMPORTANT: Add the Solo scene to your Build Settings in the Unity Editor (File > Build Settings)");
+            }
+        }
+        else if (mode == "Multiplayer")
+        {
+            // For now, just log that multiplayer mode is not implemented
+            Debug.Log("Multiplayer mode not implemented yet");
+            // Uncomment when multiplayer scene is ready
+            // SceneManager.LoadScene("Multiplayer");
+        }
     }
 
     public void SwitchTab(string tab)
@@ -364,12 +478,14 @@ public class MainMenuManager : MonoBehaviour
         Debug.Log("SaveProfileChanges in MainMenuManager is deprecated. Using ProfilePanelController instead.");
     }
 
-    // You can add methods to update player stats in real-time here
+    // Update player stats in real-time
     public void UpdateStats(int newReactionTime)
     {
-        personalBest = newReactionTime;
-        // Update UI
+        // No need to update personalBest variable as we now use PlayerPrefs
+
+        // Update UI elements
         SetupPlayerStats();
+        SetupChallengeSection();
     }
 
     // Public method to set the multiplayer button reference
@@ -381,5 +497,76 @@ public class MainMenuManager : MonoBehaviour
             multiplayerButton.onClick.AddListener(() => LoadGameMode("Multiplayer"));
             multiplayerButton.gameObject.SetActive(true);
         }
+    }
+
+    // Public method to set the solo button reference
+    public void SetSoloButton(Button button)
+    {
+        if (button != null)
+        {
+            soloButton = button;
+            soloButton.onClick.AddListener(() => LoadGameMode("Solo"));
+            soloButton.gameObject.SetActive(true);
+            Debug.Log("Solo button reference set and configured");
+        }
+    }
+
+    // Public method to force fetch data from Firebase (useful for debugging)
+    public void ForceFetchFromFirebase()
+    {
+        Debug.Log("MainMenuManager: ForceFetchFromFirebase called - manually attempting to fetch data");
+
+        // Get FirebaseManager instance
+        FirebaseManager firebaseManager = FindObjectOfType<FirebaseManager>();
+        if (firebaseManager == null)
+        {
+            Debug.LogError("MainMenuManager: No FirebaseManager found");
+            return;
+        }
+
+        // Check connection
+        Debug.Log($"MainMenuManager: Using backend URL: {firebaseManager.GetBackendUrl()}");
+        firebaseManager.CheckServerConnection((isConnected) =>
+        {
+            if (isConnected)
+            {
+                Debug.Log("MainMenuManager: Connection OK, getting reaction time");
+
+                // Get user email from PlayerPrefs
+                string email = "unknown";
+                if (PlayerPrefs.HasKey("UserEmail"))
+                {
+                    email = PlayerPrefs.GetString("UserEmail");
+                }
+
+                Debug.Log($"MainMenuManager: Using email: {email}");
+
+                // Get most recent reaction time
+                firebaseManager.GetMostRecentReactionTime((reactionTime) =>
+                {
+                    Debug.Log($"MainMenuManager: Got reaction time: {reactionTime}ms");
+                    if (reactionTime > 0)
+                    {
+                        // Find any StatsPanelController in the scene and update it directly for testing
+                        StatsPanelController[] controllers = FindObjectsOfType<StatsPanelController>();
+                        Debug.Log($"MainMenuManager: Found {controllers.Length} StatsPanelController instances");
+
+                        foreach (StatsPanelController controller in controllers)
+                        {
+                            Debug.Log($"MainMenuManager: Updating panel: {controller.gameObject.name}");
+                            controller.UpdateValueTextDirectly(Mathf.RoundToInt(reactionTime) + "ms");
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError("MainMenuManager: Server returned zero or negative reaction time");
+                    }
+                });
+            }
+            else
+            {
+                Debug.LogError("MainMenuManager: Could not connect to server");
+            }
+        });
     }
 }

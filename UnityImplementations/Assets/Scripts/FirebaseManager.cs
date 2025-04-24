@@ -184,6 +184,132 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
+    public void GetMostRecentReactionTime(Action<float> callback)
+    {
+        if (string.IsNullOrEmpty(userEmail))
+        {
+            Debug.LogError("FirebaseManager: Cannot get recent reaction time - user email not set!");
+            callback?.Invoke(0);
+            return;
+        }
+
+        StartCoroutine(GetMostRecentReactionTimeCoroutine(callback));
+    }
+
+    private IEnumerator GetMostRecentReactionTimeCoroutine(Action<float> callback)
+    {
+        string url = $"{backendUrl}/most-recent-score?email={UnityWebRequest.EscapeURL(userEmail)}";
+        Debug.Log($"FirebaseManager: Attempting to connect to: {url}");
+
+        using (UnityWebRequest request = UnityWebRequest.Get(url))
+        {
+            Debug.Log($"FirebaseManager: Fetching most recent reaction time for {userEmail}");
+
+            // Set timeout to 10 seconds to avoid long waits if server is down
+            request.timeout = 10;
+
+            yield return request.SendWebRequest();
+
+            float recentTime = 0;
+
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                string responseText = request.downloadHandler.text;
+                Debug.Log($"FirebaseManager: Most recent reaction time response: {responseText}");
+
+                try
+                {
+                    RecentScoreResponse response = JsonUtility.FromJson<RecentScoreResponse>(responseText);
+                    if (response != null && response.recentScore > 0)
+                    {
+                        recentTime = response.recentScore;
+
+                        // Also save to PlayerPrefs for offline access
+                        PlayerPrefs.SetFloat(ReactionTimeManager.LAST_REACTION_TIME_KEY, recentTime);
+                        PlayerPrefs.SetInt(ReactionTimeManager.HAS_REACTION_TIME_DATA_KEY, 1);
+                        PlayerPrefs.Save();
+
+                        Debug.Log($"FirebaseManager: Most recent reaction time: {recentTime}ms (saved to PlayerPrefs)");
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"FirebaseManager: No recent scores available yet for user {userEmail} or recentScore was 0");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"FirebaseManager: Error parsing recent score response: {e.Message}");
+                    Debug.LogError($"Response received: '{responseText}'");
+                    Debug.LogError($"Exception details: {e}");
+                }
+            }
+            else
+            {
+                Debug.LogError($"FirebaseManager: Failed to get recent reaction time: {request.error}");
+                Debug.LogError($"Response code: {request.responseCode}");
+                Debug.LogError($"Is server running at {backendUrl}? Connection error: {request.error}");
+
+                if (request.downloadHandler != null && !string.IsNullOrEmpty(request.downloadHandler.text))
+                {
+                    Debug.LogError($"Response: {request.downloadHandler.text}");
+                }
+                else
+                {
+                    Debug.LogError("No response body received");
+                }
+            }
+
+            callback?.Invoke(recentTime);
+        }
+    }
+
+    // Method to check server connection and log result
+    public void CheckServerConnection(Action<bool> callback = null)
+    {
+        StartCoroutine(CheckServerConnectionCoroutine(callback));
+    }
+
+    private IEnumerator CheckServerConnectionCoroutine(Action<bool> callback)
+    {
+        string url = $"{backendUrl}/debug";
+        Debug.Log($"FirebaseManager: Checking server connection to {url}");
+
+        using (UnityWebRequest request = UnityWebRequest.Get(url))
+        {
+            request.timeout = 5;
+            yield return request.SendWebRequest();
+
+            bool isConnected = request.result == UnityWebRequest.Result.Success;
+
+            if (isConnected)
+            {
+                Debug.Log($"FirebaseManager: Successfully connected to server at {backendUrl}");
+            }
+            else
+            {
+                Debug.LogError($"FirebaseManager: Failed to connect to server at {backendUrl}. Error: {request.error}");
+            }
+
+            callback?.Invoke(isConnected);
+        }
+    }
+
+    // Getter for backend URL for debugging
+    public string GetBackendUrl()
+    {
+        return backendUrl;
+    }
+
+    // Method to set the backend URL (useful for testing different environments)
+    public void SetBackendUrl(string url)
+    {
+        if (!string.IsNullOrEmpty(url))
+        {
+            Debug.Log($"FirebaseManager: Setting backend URL from {backendUrl} to {url}");
+            backendUrl = url;
+        }
+    }
+
     [Serializable]
     private class ScoreData
     {
@@ -196,5 +322,11 @@ public class FirebaseManager : MonoBehaviour
     private class BestScoreResponse
     {
         public int bestScore;
+    }
+
+    [Serializable]
+    private class RecentScoreResponse
+    {
+        public float recentScore;
     }
 }

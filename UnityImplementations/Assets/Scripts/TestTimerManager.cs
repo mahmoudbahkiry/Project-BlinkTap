@@ -361,6 +361,13 @@ public class TestTimerManager : MonoBehaviour
     private void OnEndTestClicked()
     {
         Debug.Log("TestTimerManager: End Test button clicked - loading main menu");
+
+        // Save the average reaction time to PlayerPrefs before returning to main menu
+        if (ReactionTimeManager.Instance != null)
+        {
+            ReactionTimeManager.Instance.SaveAverageReactionTime();
+        }
+
         // Load the main menu scene
         SceneManager.LoadScene("Main menu");
     }

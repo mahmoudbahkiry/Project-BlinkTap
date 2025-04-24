@@ -14,5 +14,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Main menu.unity
     guid: ffcebd60a6cb34c79859f52e27b4b40d
+  - enabled: 1
+    path: Assets/Scenes/Solo.unity
+    guid: 881587ac5848c4c168e2d8307aeb2b35
   m_configObjects:
     com.unity.adaptiveperformance.simulator.provider_settings: {fileID: 11400000, guid: 0fdcb82001448484a94245f01ede65fe, type: 2}
