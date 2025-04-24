@@ -366,10 +366,16 @@ public class MainMenuManager : MonoBehaviour
         }
         else if (mode == "Multiplayer")
         {
-            // For now, just log that multiplayer mode is not implemented
-            Debug.Log("Multiplayer mode not implemented yet");
-            // Uncomment when multiplayer scene is ready
-            // SceneManager.LoadScene("Multiplayer");
+            try
+            {
+                SceneManager.LoadScene("Multiplayer");
+                Debug.Log("Loading Multiplayer scene");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError("Failed to load Multiplayer scene. Make sure it's added to Build Settings! Error: " + e.Message);
+                Debug.LogWarning("IMPORTANT: Add the Multiplayer scene to your Build Settings in the Unity Editor (File > Build Settings)");
+            }
         }
     }
 

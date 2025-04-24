@@ -1795,3 +1795,929 @@ AssetImportParameters requested are different than current active one (requested
   custom:video-encoder-webm-vp8: eb34c28f22e8b96e1ab97ce403110664 -> 
   custom:audio-decoder-ogg-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
   custom:audio-encoder-webm-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+Thread 0x16f73b000 may have been prematurely finalized
+Symbol file LoadedFromMemory doesn't match image /Users/mahmoudelbahkiry/Desktop/Project-BlinkTap/UnityImplementations/Library/PackageCache/com.unity.visualscripting@1.8.0/Editor/VisualScripting.Core/Dependencies/YamlDotNet/Unity.VisualScripting.YamlDotNet.dll
+Symbol file LoadedFromMemory doesn't match image /Users/mahmoudelbahkiry/Desktop/Project-BlinkTap/UnityImplementations/Library/PackageCache/com.unity.visualscripting@1.8.0/Editor/VisualScripting.Core/Dependencies/DotNetZip/Unity.VisualScripting.IonicZip.dll
+Symbol file LoadedFromMemory is not a mono symbol file
+- Loaded All Assemblies, in  0.561 seconds
+Refreshing native plugins compatible for Editor in 3.01 ms, found 3 plugins.
+Native extension for iOS target not found
+Native extension for OSXStandalone target not found
+Mono: successfully reloaded assembly
+[Package Manager] Server::EnsureServerProcessIsRunning -- launch failed, reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] UpmClient::Send -- Unable to send message (not connected to UPM process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+- Finished resetting the current domain, in  0.873 seconds
+Domain Reload Profiling:
+	ReloadAssembly (163ms)
+		BeginReloadAssembly (116ms)
+			ExecutionOrderSort (0ms)
+			DisableScriptedObjects (9ms)
+			BackupInstance (0ms)
+			ReleaseScriptingObjects (0ms)
+			CreateAndSetChildDomain (50ms)
+		LoadAllAssembliesAndSetupDomain (398ms)
+			LoadAssemblies (212ms)
+			RebuildTransferFunctionScriptingTraits (0ms)
+			SetupTypeCache (218ms)
+				TypeCache.Initialize (212ms)
+					TypeCache.ScanAssembly (206ms)
+				ResolveRequiredComponents (4ms)
+		FinalizeReload (0ms)
+			ReleaseScriptCaches (0ms)
+			RebuildScriptCaches (0ms)
+			SetupLoadedEditorAssemblies (261ms)
+				LogAssemblyErrors (0ms)
+				InitializePlatformSupportModulesInManaged (18ms)
+				SetLoadedEditorAssemblies (3ms)
+				RefreshPlugins (0ms)
+				BeforeProcessingInitializeOnLoad (45ms)
+				ProcessInitializeOnLoadAttributes (177ms)
+				ProcessInitializeOnLoadMethodAttributes (17ms)
+				AfterProcessingInitializeOnLoad (1ms)
+				EditorAssembliesLoaded (0ms)
+			ExecutionOrderSort2 (0ms)
+			AwakeInstancesAfterBackupRestoration (6ms)
+Assertion failed on expression: 'res'
+ #0 GetStacktrace(int)
+ #1 DebugStringToFile(DebugStringToFileData const&)
+ #2 AssertImplementation(int, char const*, int, int, char const*)
+ #3 FileCacherRead::RequestBlock(int)
+ #4 FileCacherRead::LockCacheBlock(unsigned long, unsigned char**, unsigned char**)
+ #5 ReadFileCache(CacheReaderBase&, void*, VFS::FileSize, unsigned long)
+ #6 SerializedFile::FinalizeInitRead(TransferInstructionFlags)
+ #7 SerializedFile::InitializeRead(core::basic_string<char, core::StringStorageDefault<char>> const&, ResourceImageGroup&, unsigned long, bool, TransferInstructionFlags, VFS::FileSize, VFS::FileSize, CacheReaderBase*)
+ #8 PersistentManager::GetStreamNameSpaceInternal(int)
+ #9 PersistentManager::GetSerializedFileIfObjectAvailable(int, long long, PersistentManager::LockFlags)
+ #10 PersistentManager::ReadAndActivateObjectThreaded(int, SerializedObjectIdentifier const&, SerializedFile*, bool, bool, PersistentManager::LockFlags)
+ #11 PersistentManager::ReadObjectThreaded(int, PersistentManager::LockFlags)
+ #12 PersistentManager::ReadObject(int, AwakeFromLoadMode)
+ #13 PPtr<Object>::operator Object*() const
+ #14 AssetImportWorkerClient::RegisterAvailableScripts(AssetResolver&)
+ #15 AssetImportWorkerClient::ReloadMonoDomain(AssetResolver&)
+ #16 invocation function for block in AssetImportWorkerClient::HandleMessage(PrepareMessage const&)::$_4::operator()() const
+ #17 _dispatch_client_callout
+ #18 _dispatch_async_and_wait_invoke
+ #19 _dispatch_client_callout
+ #20 _dispatch_main_queue_drain
+ #21 _dispatch_main_queue_callback_4CF
+ #22 __CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE__
+ #23 __CFRunLoopRun
+ #24 CFRunLoopRunSpecific
+ #25 RunCurrentEventLoopInMode
+ #26 ReceiveNextEventCommon
+ #27 _BlockUntilNextEventMatchingListInModeWithFilter
+ #28 _DPSNextEvent
+ #29 -[NSApplication(NSEventRouting) _nextEventMatchingEventMask:untilDate:inMode:dequeue:]
+ #30 -[NSApplication run]
+ #31 NSApplicationMain
+ #32 EditorMain(int, char const**)
+ #33 main
+ #34 start
+
+Refreshing native plugins compatible for Editor in 2.50 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 4285 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 53 unused Assets / (43.6 KB). Loaded Objects now: 4820.
+Memory consumption went from 218.1 MB to 218.0 MB.
+Total: 3.312292 ms (FindLiveObjects: 0.175583 ms CreateObjectMapping: 0.069833 ms MarkObjects: 3.000625 ms  DeleteObjects: 0.065459 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+AssetImportParameters requested are different than current active one (requested -> active):
+  custom:container-demuxer-ogg: 62fdf1f143b41e24485cea50d1cbac27 -> 
+  custom:video-decoder-ogg-theora: a1e56fd34408186e4bbccfd4996cb3dc -> 
+  custom:container-demuxer-webm: 4f35f7cbe854078d1ac9338744f61a02 -> 
+  custom:container-muxer-webm: aa71ff27fc2769a1b78a27578f13a17b -> 
+  custom:video-decoder-webm-vp8: 9c59270c3fd7afecdb556c50c9e8de78 -> 
+  custom:AudioImporter_EditorPlatform: 3918e3fc78b5a79bad01e8451be0beb8 -> 
+  custom:framework-osx-AVFoundation: e770b220cccbd017edd2c1fefb359320 -> 
+  custom:video-encoder-webm-vp8: eb34c28f22e8b96e1ab97ce403110664 -> 
+  custom:audio-decoder-ogg-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+  custom:audio-encoder-webm-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+Thread 0x16f73b000 may have been prematurely finalized
+Symbol file LoadedFromMemory doesn't match image /Users/mahmoudelbahkiry/Desktop/Project-BlinkTap/UnityImplementations/Library/PackageCache/com.unity.visualscripting@1.8.0/Editor/VisualScripting.Core/Dependencies/YamlDotNet/Unity.VisualScripting.YamlDotNet.dll
+Symbol file LoadedFromMemory doesn't match image /Users/mahmoudelbahkiry/Desktop/Project-BlinkTap/UnityImplementations/Library/PackageCache/com.unity.visualscripting@1.8.0/Editor/VisualScripting.Core/Dependencies/DotNetZip/Unity.VisualScripting.IonicZip.dll
+Symbol file LoadedFromMemory is not a mono symbol file
+- Loaded All Assemblies, in  0.553 seconds
+Refreshing native plugins compatible for Editor in 2.21 ms, found 3 plugins.
+Native extension for iOS target not found
+Native extension for OSXStandalone target not found
+Mono: successfully reloaded assembly
+[Package Manager] Server::EnsureServerProcessIsRunning -- launch failed, reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] UpmClient::Send -- Unable to send message (not connected to UPM process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+- Finished resetting the current domain, in  0.989 seconds
+Domain Reload Profiling:
+	ReloadAssembly (163ms)
+		BeginReloadAssembly (116ms)
+			ExecutionOrderSort (0ms)
+			DisableScriptedObjects (9ms)
+			BackupInstance (0ms)
+			ReleaseScriptingObjects (0ms)
+			CreateAndSetChildDomain (50ms)
+		LoadAllAssembliesAndSetupDomain (390ms)
+			LoadAssemblies (207ms)
+			RebuildTransferFunctionScriptingTraits (0ms)
+			SetupTypeCache (217ms)
+				TypeCache.Initialize (212ms)
+					TypeCache.ScanAssembly (200ms)
+				ResolveRequiredComponents (4ms)
+		FinalizeReload (0ms)
+			ReleaseScriptCaches (0ms)
+			RebuildScriptCaches (0ms)
+			SetupLoadedEditorAssemblies (286ms)
+				LogAssemblyErrors (0ms)
+				InitializePlatformSupportModulesInManaged (17ms)
+				SetLoadedEditorAssemblies (3ms)
+				RefreshPlugins (0ms)
+				BeforeProcessingInitializeOnLoad (44ms)
+				ProcessInitializeOnLoadAttributes (202ms)
+				ProcessInitializeOnLoadMethodAttributes (18ms)
+				AfterProcessingInitializeOnLoad (1ms)
+				EditorAssembliesLoaded (0ms)
+			ExecutionOrderSort2 (0ms)
+			AwakeInstancesAfterBackupRestoration (6ms)
+Assertion failed on expression: 'res'
+ #0 GetStacktrace(int)
+ #1 DebugStringToFile(DebugStringToFileData const&)
+ #2 AssertImplementation(int, char const*, int, int, char const*)
+ #3 FileCacherRead::RequestBlock(int)
+ #4 FileCacherRead::LockCacheBlock(unsigned long, unsigned char**, unsigned char**)
+ #5 ReadFileCache(CacheReaderBase&, void*, VFS::FileSize, unsigned long)
+ #6 SerializedFile::FinalizeInitRead(TransferInstructionFlags)
+ #7 SerializedFile::InitializeRead(core::basic_string<char, core::StringStorageDefault<char>> const&, ResourceImageGroup&, unsigned long, bool, TransferInstructionFlags, VFS::FileSize, VFS::FileSize, CacheReaderBase*)
+ #8 PersistentManager::GetStreamNameSpaceInternal(int)
+ #9 PersistentManager::GetSerializedFileIfObjectAvailable(int, long long, PersistentManager::LockFlags)
+ #10 PersistentManager::ReadAndActivateObjectThreaded(int, SerializedObjectIdentifier const&, SerializedFile*, bool, bool, PersistentManager::LockFlags)
+ #11 PersistentManager::ReadObjectThreaded(int, PersistentManager::LockFlags)
+ #12 PersistentManager::ReadObject(int, AwakeFromLoadMode)
+ #13 PPtr<Object>::operator Object*() const
+ #14 AssetImportWorkerClient::RegisterAvailableScripts(AssetResolver&)
+ #15 AssetImportWorkerClient::ReloadMonoDomain(AssetResolver&)
+ #16 invocation function for block in AssetImportWorkerClient::HandleMessage(PrepareMessage const&)::$_4::operator()() const
+ #17 _dispatch_client_callout
+ #18 _dispatch_async_and_wait_invoke
+ #19 _dispatch_client_callout
+ #20 _dispatch_main_queue_drain
+ #21 _dispatch_main_queue_callback_4CF
+ #22 __CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE__
+ #23 __CFRunLoopRun
+ #24 CFRunLoopRunSpecific
+ #25 RunCurrentEventLoopInMode
+ #26 ReceiveNextEventCommon
+ #27 _BlockUntilNextEventMatchingListInModeWithFilter
+ #28 _DPSNextEvent
+ #29 -[NSApplication(NSEventRouting) _nextEventMatchingEventMask:untilDate:inMode:dequeue:]
+ #30 -[NSApplication run]
+ #31 NSApplicationMain
+ #32 EditorMain(int, char const**)
+ #33 main
+ #34 start
+
+Refreshing native plugins compatible for Editor in 2.52 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 4285 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 53 unused Assets / (43.5 KB). Loaded Objects now: 4824.
+Memory consumption went from 223.3 MB to 223.3 MB.
+Total: 3.431792 ms (FindLiveObjects: 0.243417 ms CreateObjectMapping: 0.072083 ms MarkObjects: 3.039209 ms  DeleteObjects: 0.076292 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+AssetImportParameters requested are different than current active one (requested -> active):
+  custom:container-demuxer-ogg: 62fdf1f143b41e24485cea50d1cbac27 -> 
+  custom:video-decoder-ogg-theora: a1e56fd34408186e4bbccfd4996cb3dc -> 
+  custom:container-demuxer-webm: 4f35f7cbe854078d1ac9338744f61a02 -> 
+  custom:container-muxer-webm: aa71ff27fc2769a1b78a27578f13a17b -> 
+  custom:video-decoder-webm-vp8: 9c59270c3fd7afecdb556c50c9e8de78 -> 
+  custom:AudioImporter_EditorPlatform: 3918e3fc78b5a79bad01e8451be0beb8 -> 
+  custom:framework-osx-AVFoundation: e770b220cccbd017edd2c1fefb359320 -> 
+  custom:video-encoder-webm-vp8: eb34c28f22e8b96e1ab97ce403110664 -> 
+  custom:audio-decoder-ogg-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+  custom:audio-encoder-webm-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+Thread 0x16f7c7000 may have been prematurely finalized
+Symbol file LoadedFromMemory doesn't match image /Users/mahmoudelbahkiry/Desktop/Project-BlinkTap/UnityImplementations/Library/PackageCache/com.unity.visualscripting@1.8.0/Editor/VisualScripting.Core/Dependencies/YamlDotNet/Unity.VisualScripting.YamlDotNet.dll
+Symbol file LoadedFromMemory doesn't match image /Users/mahmoudelbahkiry/Desktop/Project-BlinkTap/UnityImplementations/Library/PackageCache/com.unity.visualscripting@1.8.0/Editor/VisualScripting.Core/Dependencies/DotNetZip/Unity.VisualScripting.IonicZip.dll
+Symbol file LoadedFromMemory is not a mono symbol file
+- Loaded All Assemblies, in  0.585 seconds
+Refreshing native plugins compatible for Editor in 3.41 ms, found 3 plugins.
+Native extension for iOS target not found
+Native extension for OSXStandalone target not found
+Mono: successfully reloaded assembly
+[Package Manager] Server::EnsureServerProcessIsRunning -- launch failed, reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] UpmClient::Send -- Unable to send message (not connected to UPM process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+- Finished resetting the current domain, in  0.819 seconds
+Domain Reload Profiling:
+	ReloadAssembly (185ms)
+		BeginReloadAssembly (124ms)
+			ExecutionOrderSort (0ms)
+			DisableScriptedObjects (9ms)
+			BackupInstance (0ms)
+			ReleaseScriptingObjects (0ms)
+			CreateAndSetChildDomain (53ms)
+		LoadAllAssembliesAndSetupDomain (400ms)
+			LoadAssemblies (233ms)
+			RebuildTransferFunctionScriptingTraits (0ms)
+			SetupTypeCache (204ms)
+				TypeCache.Initialize (198ms)
+					TypeCache.ScanAssembly (193ms)
+				ResolveRequiredComponents (3ms)
+		FinalizeReload (0ms)
+			ReleaseScriptCaches (0ms)
+			RebuildScriptCaches (0ms)
+			SetupLoadedEditorAssemblies (239ms)
+				LogAssemblyErrors (0ms)
+				InitializePlatformSupportModulesInManaged (18ms)
+				SetLoadedEditorAssemblies (3ms)
+				RefreshPlugins (0ms)
+				BeforeProcessingInitializeOnLoad (40ms)
+				ProcessInitializeOnLoadAttributes (163ms)
+				ProcessInitializeOnLoadMethodAttributes (15ms)
+				AfterProcessingInitializeOnLoad (1ms)
+				EditorAssembliesLoaded (0ms)
+			ExecutionOrderSort2 (0ms)
+			AwakeInstancesAfterBackupRestoration (5ms)
+Assertion failed on expression: 'res'
+ #0 GetStacktrace(int)
+ #1 DebugStringToFile(DebugStringToFileData const&)
+ #2 AssertImplementation(int, char const*, int, int, char const*)
+ #3 FileCacherRead::RequestBlock(int)
+ #4 FileCacherRead::LockCacheBlock(unsigned long, unsigned char**, unsigned char**)
+ #5 ReadFileCache(CacheReaderBase&, void*, VFS::FileSize, unsigned long)
+ #6 SerializedFile::FinalizeInitRead(TransferInstructionFlags)
+ #7 SerializedFile::InitializeRead(core::basic_string<char, core::StringStorageDefault<char>> const&, ResourceImageGroup&, unsigned long, bool, TransferInstructionFlags, VFS::FileSize, VFS::FileSize, CacheReaderBase*)
+ #8 PersistentManager::GetStreamNameSpaceInternal(int)
+ #9 PersistentManager::GetSerializedFileIfObjectAvailable(int, long long, PersistentManager::LockFlags)
+ #10 PersistentManager::ReadAndActivateObjectThreaded(int, SerializedObjectIdentifier const&, SerializedFile*, bool, bool, PersistentManager::LockFlags)
+ #11 PersistentManager::ReadObjectThreaded(int, PersistentManager::LockFlags)
+ #12 PersistentManager::ReadObject(int, AwakeFromLoadMode)
+ #13 PPtr<Object>::operator Object*() const
+ #14 AssetImportWorkerClient::RegisterAvailableScripts(AssetResolver&)
+ #15 AssetImportWorkerClient::ReloadMonoDomain(AssetResolver&)
+ #16 invocation function for block in AssetImportWorkerClient::HandleMessage(PrepareMessage const&)::$_4::operator()() const
+ #17 _dispatch_client_callout
+ #18 _dispatch_async_and_wait_invoke
+ #19 _dispatch_client_callout
+ #20 _dispatch_main_queue_drain
+ #21 _dispatch_main_queue_callback_4CF
+ #22 __CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE__
+ #23 __CFRunLoopRun
+ #24 CFRunLoopRunSpecific
+ #25 RunCurrentEventLoopInMode
+ #26 ReceiveNextEventCommon
+ #27 _BlockUntilNextEventMatchingListInModeWithFilter
+ #28 _DPSNextEvent
+ #29 -[NSApplication(NSEventRouting) _nextEventMatchingEventMask:untilDate:inMode:dequeue:]
+ #30 -[NSApplication run]
+ #31 NSApplicationMain
+ #32 EditorMain(int, char const**)
+ #33 main
+ #34 start
+
+Refreshing native plugins compatible for Editor in 2.32 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 4285 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 53 unused Assets / (44.5 KB). Loaded Objects now: 4828.
+Memory consumption went from 228.6 MB to 228.6 MB.
+Total: 2.916875 ms (FindLiveObjects: 0.185042 ms CreateObjectMapping: 0.060500 ms MarkObjects: 2.610250 ms  DeleteObjects: 0.060042 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+AssetImportParameters requested are different than current active one (requested -> active):
+  custom:container-demuxer-ogg: 62fdf1f143b41e24485cea50d1cbac27 -> 
+  custom:video-decoder-ogg-theora: a1e56fd34408186e4bbccfd4996cb3dc -> 
+  custom:container-demuxer-webm: 4f35f7cbe854078d1ac9338744f61a02 -> 
+  custom:container-muxer-webm: aa71ff27fc2769a1b78a27578f13a17b -> 
+  custom:video-decoder-webm-vp8: 9c59270c3fd7afecdb556c50c9e8de78 -> 
+  custom:AudioImporter_EditorPlatform: 3918e3fc78b5a79bad01e8451be0beb8 -> 
+  custom:framework-osx-AVFoundation: e770b220cccbd017edd2c1fefb359320 -> 
+  custom:video-encoder-webm-vp8: eb34c28f22e8b96e1ab97ce403110664 -> 
+  custom:audio-decoder-ogg-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+  custom:audio-encoder-webm-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+Thread 0x16f7c7000 may have been prematurely finalized
+Symbol file LoadedFromMemory doesn't match image /Users/mahmoudelbahkiry/Desktop/Project-BlinkTap/UnityImplementations/Library/PackageCache/com.unity.visualscripting@1.8.0/Editor/VisualScripting.Core/Dependencies/YamlDotNet/Unity.VisualScripting.YamlDotNet.dll
+Symbol file LoadedFromMemory doesn't match image /Users/mahmoudelbahkiry/Desktop/Project-BlinkTap/UnityImplementations/Library/PackageCache/com.unity.visualscripting@1.8.0/Editor/VisualScripting.Core/Dependencies/DotNetZip/Unity.VisualScripting.IonicZip.dll
+Symbol file LoadedFromMemory is not a mono symbol file
+- Loaded All Assemblies, in  0.477 seconds
+Refreshing native plugins compatible for Editor in 2.14 ms, found 3 plugins.
+Native extension for iOS target not found
+Native extension for OSXStandalone target not found
+Mono: successfully reloaded assembly
+[Package Manager] Server::EnsureServerProcessIsRunning -- launch failed, reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] UpmClient::Send -- Unable to send message (not connected to UPM process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+- Finished resetting the current domain, in  0.514 seconds
+Domain Reload Profiling:
+	ReloadAssembly (162ms)
+		BeginReloadAssembly (115ms)
+			ExecutionOrderSort (0ms)
+			DisableScriptedObjects (8ms)
+			BackupInstance (0ms)
+			ReleaseScriptingObjects (0ms)
+			CreateAndSetChildDomain (51ms)
+		LoadAllAssembliesAndSetupDomain (315ms)
+			LoadAssemblies (156ms)
+			RebuildTransferFunctionScriptingTraits (0ms)
+			SetupTypeCache (191ms)
+				TypeCache.Initialize (188ms)
+					TypeCache.ScanAssembly (184ms)
+				ResolveRequiredComponents (3ms)
+		FinalizeReload (0ms)
+			ReleaseScriptCaches (0ms)
+			RebuildScriptCaches (0ms)
+			SetupLoadedEditorAssemblies (264ms)
+				LogAssemblyErrors (0ms)
+				InitializePlatformSupportModulesInManaged (17ms)
+				SetLoadedEditorAssemblies (3ms)
+				RefreshPlugins (0ms)
+				BeforeProcessingInitializeOnLoad (40ms)
+				ProcessInitializeOnLoadAttributes (182ms)
+				ProcessInitializeOnLoadMethodAttributes (22ms)
+				AfterProcessingInitializeOnLoad (1ms)
+				EditorAssembliesLoaded (0ms)
+			ExecutionOrderSort2 (0ms)
+			AwakeInstancesAfterBackupRestoration (7ms)
+Assertion failed on expression: 'res'
+ #0 GetStacktrace(int)
+ #1 DebugStringToFile(DebugStringToFileData const&)
+ #2 AssertImplementation(int, char const*, int, int, char const*)
+ #3 FileCacherRead::RequestBlock(int)
+ #4 FileCacherRead::LockCacheBlock(unsigned long, unsigned char**, unsigned char**)
+ #5 ReadFileCache(CacheReaderBase&, void*, VFS::FileSize, unsigned long)
+ #6 SerializedFile::FinalizeInitRead(TransferInstructionFlags)
+ #7 SerializedFile::InitializeRead(core::basic_string<char, core::StringStorageDefault<char>> const&, ResourceImageGroup&, unsigned long, bool, TransferInstructionFlags, VFS::FileSize, VFS::FileSize, CacheReaderBase*)
+ #8 PersistentManager::GetStreamNameSpaceInternal(int)
+ #9 PersistentManager::GetSerializedFileIfObjectAvailable(int, long long, PersistentManager::LockFlags)
+ #10 PersistentManager::ReadAndActivateObjectThreaded(int, SerializedObjectIdentifier const&, SerializedFile*, bool, bool, PersistentManager::LockFlags)
+ #11 PersistentManager::ReadObjectThreaded(int, PersistentManager::LockFlags)
+ #12 PersistentManager::ReadObject(int, AwakeFromLoadMode)
+ #13 PPtr<Object>::operator Object*() const
+ #14 AssetImportWorkerClient::RegisterAvailableScripts(AssetResolver&)
+ #15 AssetImportWorkerClient::ReloadMonoDomain(AssetResolver&)
+ #16 invocation function for block in AssetImportWorkerClient::HandleMessage(PrepareMessage const&)::$_4::operator()() const
+ #17 _dispatch_client_callout
+ #18 _dispatch_async_and_wait_invoke
+ #19 _dispatch_client_callout
+ #20 _dispatch_main_queue_drain
+ #21 _dispatch_main_queue_callback_4CF
+ #22 __CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE__
+ #23 __CFRunLoopRun
+ #24 CFRunLoopRunSpecific
+ #25 RunCurrentEventLoopInMode
+ #26 ReceiveNextEventCommon
+ #27 _BlockUntilNextEventMatchingListInModeWithFilter
+ #28 _DPSNextEvent
+ #29 -[NSApplication(NSEventRouting) _nextEventMatchingEventMask:untilDate:inMode:dequeue:]
+ #30 -[NSApplication run]
+ #31 NSApplicationMain
+ #32 EditorMain(int, char const**)
+ #33 main
+ #34 start
+
+Refreshing native plugins compatible for Editor in 2.45 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 4285 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 53 unused Assets / (44.6 KB). Loaded Objects now: 4832.
+Memory consumption went from 233.9 MB to 233.9 MB.
+Total: 2.982667 ms (FindLiveObjects: 0.188917 ms CreateObjectMapping: 0.058708 ms MarkObjects: 2.652667 ms  DeleteObjects: 0.081584 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+AssetImportParameters requested are different than current active one (requested -> active):
+  custom:container-demuxer-ogg: 62fdf1f143b41e24485cea50d1cbac27 -> 
+  custom:video-decoder-ogg-theora: a1e56fd34408186e4bbccfd4996cb3dc -> 
+  custom:container-demuxer-webm: 4f35f7cbe854078d1ac9338744f61a02 -> 
+  custom:container-muxer-webm: aa71ff27fc2769a1b78a27578f13a17b -> 
+  custom:video-decoder-webm-vp8: 9c59270c3fd7afecdb556c50c9e8de78 -> 
+  custom:AudioImporter_EditorPlatform: 3918e3fc78b5a79bad01e8451be0beb8 -> 
+  custom:framework-osx-AVFoundation: e770b220cccbd017edd2c1fefb359320 -> 
+  custom:video-encoder-webm-vp8: eb34c28f22e8b96e1ab97ce403110664 -> 
+  custom:audio-decoder-ogg-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+  custom:audio-encoder-webm-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+Thread 0x16f7c7000 may have been prematurely finalized
+Symbol file LoadedFromMemory doesn't match image /Users/mahmoudelbahkiry/Desktop/Project-BlinkTap/UnityImplementations/Library/PackageCache/com.unity.visualscripting@1.8.0/Editor/VisualScripting.Core/Dependencies/YamlDotNet/Unity.VisualScripting.YamlDotNet.dll
+Symbol file LoadedFromMemory doesn't match image /Users/mahmoudelbahkiry/Desktop/Project-BlinkTap/UnityImplementations/Library/PackageCache/com.unity.visualscripting@1.8.0/Editor/VisualScripting.Core/Dependencies/DotNetZip/Unity.VisualScripting.IonicZip.dll
+Symbol file LoadedFromMemory is not a mono symbol file
+- Loaded All Assemblies, in  0.536 seconds
+Refreshing native plugins compatible for Editor in 2.96 ms, found 3 plugins.
+Native extension for iOS target not found
+Native extension for OSXStandalone target not found
+Mono: successfully reloaded assembly
+[Package Manager] Server::EnsureServerProcessIsRunning -- launch failed, reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] UpmClient::Send -- Unable to send message (not connected to UPM process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+- Finished resetting the current domain, in  0.830 seconds
+Domain Reload Profiling:
+	ReloadAssembly (167ms)
+		BeginReloadAssembly (120ms)
+			ExecutionOrderSort (0ms)
+			DisableScriptedObjects (9ms)
+			BackupInstance (0ms)
+			ReleaseScriptingObjects (0ms)
+			CreateAndSetChildDomain (53ms)
+		LoadAllAssembliesAndSetupDomain (370ms)
+			LoadAssemblies (198ms)
+			RebuildTransferFunctionScriptingTraits (0ms)
+			SetupTypeCache (206ms)
+				TypeCache.Initialize (203ms)
+					TypeCache.ScanAssembly (199ms)
+				ResolveRequiredComponents (4ms)
+		FinalizeReload (0ms)
+			ReleaseScriptCaches (0ms)
+			RebuildScriptCaches (0ms)
+			SetupLoadedEditorAssemblies (258ms)
+				LogAssemblyErrors (0ms)
+				InitializePlatformSupportModulesInManaged (15ms)
+				SetLoadedEditorAssemblies (3ms)
+				RefreshPlugins (0ms)
+				BeforeProcessingInitializeOnLoad (42ms)
+				ProcessInitializeOnLoadAttributes (179ms)
+				ProcessInitializeOnLoadMethodAttributes (18ms)
+				AfterProcessingInitializeOnLoad (1ms)
+				EditorAssembliesLoaded (0ms)
+			ExecutionOrderSort2 (0ms)
+			AwakeInstancesAfterBackupRestoration (7ms)
+Assertion failed on expression: 'res'
+ #0 GetStacktrace(int)
+ #1 DebugStringToFile(DebugStringToFileData const&)
+ #2 AssertImplementation(int, char const*, int, int, char const*)
+ #3 FileCacherRead::RequestBlock(int)
+ #4 FileCacherRead::LockCacheBlock(unsigned long, unsigned char**, unsigned char**)
+ #5 ReadFileCache(CacheReaderBase&, void*, VFS::FileSize, unsigned long)
+ #6 SerializedFile::FinalizeInitRead(TransferInstructionFlags)
+ #7 SerializedFile::InitializeRead(core::basic_string<char, core::StringStorageDefault<char>> const&, ResourceImageGroup&, unsigned long, bool, TransferInstructionFlags, VFS::FileSize, VFS::FileSize, CacheReaderBase*)
+ #8 PersistentManager::GetStreamNameSpaceInternal(int)
+ #9 PersistentManager::GetSerializedFileIfObjectAvailable(int, long long, PersistentManager::LockFlags)
+ #10 PersistentManager::ReadAndActivateObjectThreaded(int, SerializedObjectIdentifier const&, SerializedFile*, bool, bool, PersistentManager::LockFlags)
+ #11 PersistentManager::ReadObjectThreaded(int, PersistentManager::LockFlags)
+ #12 PersistentManager::ReadObject(int, AwakeFromLoadMode)
+ #13 PPtr<Object>::operator Object*() const
+ #14 AssetImportWorkerClient::RegisterAvailableScripts(AssetResolver&)
+ #15 AssetImportWorkerClient::ReloadMonoDomain(AssetResolver&)
+ #16 invocation function for block in AssetImportWorkerClient::HandleMessage(PrepareMessage const&)::$_4::operator()() const
+ #17 _dispatch_client_callout
+ #18 _dispatch_async_and_wait_invoke
+ #19 _dispatch_client_callout
+ #20 _dispatch_main_queue_drain
+ #21 _dispatch_main_queue_callback_4CF
+ #22 __CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE__
+ #23 __CFRunLoopRun
+ #24 CFRunLoopRunSpecific
+ #25 RunCurrentEventLoopInMode
+ #26 ReceiveNextEventCommon
+ #27 _BlockUntilNextEventMatchingListInModeWithFilter
+ #28 _DPSNextEvent
+ #29 -[NSApplication(NSEventRouting) _nextEventMatchingEventMask:untilDate:inMode:dequeue:]
+ #30 -[NSApplication run]
+ #31 NSApplicationMain
+ #32 EditorMain(int, char const**)
+ #33 main
+ #34 start
+
+Refreshing native plugins compatible for Editor in 2.58 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 4285 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 53 unused Assets / (44.6 KB). Loaded Objects now: 4836.
+Memory consumption went from 239.2 MB to 239.2 MB.
+Total: 3.502000 ms (FindLiveObjects: 0.202084 ms CreateObjectMapping: 0.062125 ms MarkObjects: 3.164084 ms  DeleteObjects: 0.072791 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+AssetImportParameters requested are different than current active one (requested -> active):
+  custom:container-demuxer-ogg: 62fdf1f143b41e24485cea50d1cbac27 -> 
+  custom:video-decoder-ogg-theora: a1e56fd34408186e4bbccfd4996cb3dc -> 
+  custom:container-demuxer-webm: 4f35f7cbe854078d1ac9338744f61a02 -> 
+  custom:container-muxer-webm: aa71ff27fc2769a1b78a27578f13a17b -> 
+  custom:video-decoder-webm-vp8: 9c59270c3fd7afecdb556c50c9e8de78 -> 
+  custom:AudioImporter_EditorPlatform: 3918e3fc78b5a79bad01e8451be0beb8 -> 
+  custom:framework-osx-AVFoundation: e770b220cccbd017edd2c1fefb359320 -> 
+  custom:video-encoder-webm-vp8: eb34c28f22e8b96e1ab97ce403110664 -> 
+  custom:audio-decoder-ogg-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+  custom:audio-encoder-webm-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+Thread 0x16fd3f000 may have been prematurely finalized
+Symbol file LoadedFromMemory doesn't match image /Users/mahmoudelbahkiry/Desktop/Project-BlinkTap/UnityImplementations/Library/PackageCache/com.unity.visualscripting@1.8.0/Editor/VisualScripting.Core/Dependencies/YamlDotNet/Unity.VisualScripting.YamlDotNet.dll
+Symbol file LoadedFromMemory doesn't match image /Users/mahmoudelbahkiry/Desktop/Project-BlinkTap/UnityImplementations/Library/PackageCache/com.unity.visualscripting@1.8.0/Editor/VisualScripting.Core/Dependencies/DotNetZip/Unity.VisualScripting.IonicZip.dll
+Symbol file LoadedFromMemory is not a mono symbol file
+- Loaded All Assemblies, in  0.553 seconds
+Refreshing native plugins compatible for Editor in 2.92 ms, found 3 plugins.
+Native extension for iOS target not found
+Native extension for OSXStandalone target not found
+Mono: successfully reloaded assembly
+[Package Manager] Server::EnsureServerProcessIsRunning -- launch failed, reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] UpmClient::Send -- Unable to send message (not connected to UPM process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+- Finished resetting the current domain, in  0.808 seconds
+Domain Reload Profiling:
+	ReloadAssembly (166ms)
+		BeginReloadAssembly (117ms)
+			ExecutionOrderSort (0ms)
+			DisableScriptedObjects (9ms)
+			BackupInstance (0ms)
+			ReleaseScriptingObjects (0ms)
+			CreateAndSetChildDomain (53ms)
+		LoadAllAssembliesAndSetupDomain (387ms)
+			LoadAssemblies (209ms)
+			RebuildTransferFunctionScriptingTraits (0ms)
+			SetupTypeCache (210ms)
+				TypeCache.Initialize (204ms)
+					TypeCache.ScanAssembly (200ms)
+				ResolveRequiredComponents (3ms)
+		FinalizeReload (0ms)
+			ReleaseScriptCaches (0ms)
+			RebuildScriptCaches (0ms)
+			SetupLoadedEditorAssemblies (233ms)
+				LogAssemblyErrors (0ms)
+				InitializePlatformSupportModulesInManaged (16ms)
+				SetLoadedEditorAssemblies (3ms)
+				RefreshPlugins (0ms)
+				BeforeProcessingInitializeOnLoad (38ms)
+				ProcessInitializeOnLoadAttributes (160ms)
+				ProcessInitializeOnLoadMethodAttributes (15ms)
+				AfterProcessingInitializeOnLoad (1ms)
+				EditorAssembliesLoaded (0ms)
+			ExecutionOrderSort2 (0ms)
+			AwakeInstancesAfterBackupRestoration (5ms)
+Assertion failed on expression: 'res'
+ #0 GetStacktrace(int)
+ #1 DebugStringToFile(DebugStringToFileData const&)
+ #2 AssertImplementation(int, char const*, int, int, char const*)
+ #3 FileCacherRead::RequestBlock(int)
+ #4 FileCacherRead::LockCacheBlock(unsigned long, unsigned char**, unsigned char**)
+ #5 ReadFileCache(CacheReaderBase&, void*, VFS::FileSize, unsigned long)
+ #6 SerializedFile::FinalizeInitRead(TransferInstructionFlags)
+ #7 SerializedFile::InitializeRead(core::basic_string<char, core::StringStorageDefault<char>> const&, ResourceImageGroup&, unsigned long, bool, TransferInstructionFlags, VFS::FileSize, VFS::FileSize, CacheReaderBase*)
+ #8 PersistentManager::GetStreamNameSpaceInternal(int)
+ #9 PersistentManager::GetSerializedFileIfObjectAvailable(int, long long, PersistentManager::LockFlags)
+ #10 PersistentManager::ReadAndActivateObjectThreaded(int, SerializedObjectIdentifier const&, SerializedFile*, bool, bool, PersistentManager::LockFlags)
+ #11 PersistentManager::ReadObjectThreaded(int, PersistentManager::LockFlags)
+ #12 PersistentManager::ReadObject(int, AwakeFromLoadMode)
+ #13 PPtr<Object>::operator Object*() const
+ #14 AssetImportWorkerClient::RegisterAvailableScripts(AssetResolver&)
+ #15 AssetImportWorkerClient::ReloadMonoDomain(AssetResolver&)
+ #16 invocation function for block in AssetImportWorkerClient::HandleMessage(PrepareMessage const&)::$_4::operator()() const
+ #17 _dispatch_client_callout
+ #18 _dispatch_async_and_wait_invoke
+ #19 _dispatch_client_callout
+ #20 _dispatch_main_queue_drain
+ #21 _dispatch_main_queue_callback_4CF
+ #22 __CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE__
+ #23 __CFRunLoopRun
+ #24 CFRunLoopRunSpecific
+ #25 RunCurrentEventLoopInMode
+ #26 ReceiveNextEventCommon
+ #27 _BlockUntilNextEventMatchingListInModeWithFilter
+ #28 _DPSNextEvent
+ #29 -[NSApplication(NSEventRouting) _nextEventMatchingEventMask:untilDate:inMode:dequeue:]
+ #30 -[NSApplication run]
+ #31 NSApplicationMain
+ #32 EditorMain(int, char const**)
+ #33 main
+ #34 start
+
+Refreshing native plugins compatible for Editor in 2.17 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 4285 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 53 unused Assets / (44.5 KB). Loaded Objects now: 4840.
+Memory consumption went from 244.5 MB to 244.5 MB.
+Total: 2.784709 ms (FindLiveObjects: 0.217459 ms CreateObjectMapping: 0.056416 ms MarkObjects: 2.442000 ms  DeleteObjects: 0.068084 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+AssetImportParameters requested are different than current active one (requested -> active):
+  custom:container-demuxer-ogg: 62fdf1f143b41e24485cea50d1cbac27 -> 
+  custom:video-decoder-ogg-theora: a1e56fd34408186e4bbccfd4996cb3dc -> 
+  custom:container-demuxer-webm: 4f35f7cbe854078d1ac9338744f61a02 -> 
+  custom:container-muxer-webm: aa71ff27fc2769a1b78a27578f13a17b -> 
+  custom:video-decoder-webm-vp8: 9c59270c3fd7afecdb556c50c9e8de78 -> 
+  custom:AudioImporter_EditorPlatform: 3918e3fc78b5a79bad01e8451be0beb8 -> 
+  custom:framework-osx-AVFoundation: e770b220cccbd017edd2c1fefb359320 -> 
+  custom:video-encoder-webm-vp8: eb34c28f22e8b96e1ab97ce403110664 -> 
+  custom:audio-decoder-ogg-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+  custom:audio-encoder-webm-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+Thread 0x16fd3f000 may have been prematurely finalized
+Symbol file LoadedFromMemory doesn't match image /Users/mahmoudelbahkiry/Desktop/Project-BlinkTap/UnityImplementations/Library/PackageCache/com.unity.visualscripting@1.8.0/Editor/VisualScripting.Core/Dependencies/YamlDotNet/Unity.VisualScripting.YamlDotNet.dll
+Symbol file LoadedFromMemory doesn't match image /Users/mahmoudelbahkiry/Desktop/Project-BlinkTap/UnityImplementations/Library/PackageCache/com.unity.visualscripting@1.8.0/Editor/VisualScripting.Core/Dependencies/DotNetZip/Unity.VisualScripting.IonicZip.dll
+Symbol file LoadedFromMemory is not a mono symbol file
+- Loaded All Assemblies, in  0.540 seconds
+Refreshing native plugins compatible for Editor in 2.25 ms, found 3 plugins.
+Native extension for iOS target not found
+Native extension for OSXStandalone target not found
+Mono: successfully reloaded assembly
+[Package Manager] Server::EnsureServerProcessIsRunning -- launch failed, reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] UpmClient::Send -- Unable to send message (not connected to UPM process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+- Finished resetting the current domain, in  0.499 seconds
+Domain Reload Profiling:
+	ReloadAssembly (172ms)
+		BeginReloadAssembly (124ms)
+			ExecutionOrderSort (0ms)
+			DisableScriptedObjects (9ms)
+			BackupInstance (0ms)
+			ReleaseScriptingObjects (0ms)
+			CreateAndSetChildDomain (54ms)
+		LoadAllAssembliesAndSetupDomain (368ms)
+			LoadAssemblies (172ms)
+			RebuildTransferFunctionScriptingTraits (0ms)
+			SetupTypeCache (232ms)
+				TypeCache.Initialize (228ms)
+					TypeCache.ScanAssembly (221ms)
+				ResolveRequiredComponents (4ms)
+		FinalizeReload (0ms)
+			ReleaseScriptCaches (0ms)
+			RebuildScriptCaches (0ms)
+			SetupLoadedEditorAssemblies (262ms)
+				LogAssemblyErrors (0ms)
+				InitializePlatformSupportModulesInManaged (15ms)
+				SetLoadedEditorAssemblies (3ms)
+				RefreshPlugins (0ms)
+				BeforeProcessingInitializeOnLoad (48ms)
+				ProcessInitializeOnLoadAttributes (178ms)
+				ProcessInitializeOnLoadMethodAttributes (18ms)
+				AfterProcessingInitializeOnLoad (1ms)
+				EditorAssembliesLoaded (0ms)
+			ExecutionOrderSort2 (0ms)
+			AwakeInstancesAfterBackupRestoration (6ms)
+Assertion failed on expression: 'res'
+ #0 GetStacktrace(int)
+ #1 DebugStringToFile(DebugStringToFileData const&)
+ #2 AssertImplementation(int, char const*, int, int, char const*)
+ #3 FileCacherRead::RequestBlock(int)
+ #4 FileCacherRead::LockCacheBlock(unsigned long, unsigned char**, unsigned char**)
+ #5 ReadFileCache(CacheReaderBase&, void*, VFS::FileSize, unsigned long)
+ #6 SerializedFile::FinalizeInitRead(TransferInstructionFlags)
+ #7 SerializedFile::InitializeRead(core::basic_string<char, core::StringStorageDefault<char>> const&, ResourceImageGroup&, unsigned long, bool, TransferInstructionFlags, VFS::FileSize, VFS::FileSize, CacheReaderBase*)
+ #8 PersistentManager::GetStreamNameSpaceInternal(int)
+ #9 PersistentManager::GetSerializedFileIfObjectAvailable(int, long long, PersistentManager::LockFlags)
+ #10 PersistentManager::ReadAndActivateObjectThreaded(int, SerializedObjectIdentifier const&, SerializedFile*, bool, bool, PersistentManager::LockFlags)
+ #11 PersistentManager::ReadObjectThreaded(int, PersistentManager::LockFlags)
+ #12 PersistentManager::ReadObject(int, AwakeFromLoadMode)
+ #13 PPtr<Object>::operator Object*() const
+ #14 AssetImportWorkerClient::RegisterAvailableScripts(AssetResolver&)
+ #15 AssetImportWorkerClient::ReloadMonoDomain(AssetResolver&)
+ #16 invocation function for block in AssetImportWorkerClient::HandleMessage(PrepareMessage const&)::$_4::operator()() const
+ #17 _dispatch_client_callout
+ #18 _dispatch_async_and_wait_invoke
+ #19 _dispatch_client_callout
+ #20 _dispatch_main_queue_drain
+ #21 _dispatch_main_queue_callback_4CF
+ #22 __CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE__
+ #23 __CFRunLoopRun
+ #24 CFRunLoopRunSpecific
+ #25 RunCurrentEventLoopInMode
+ #26 ReceiveNextEventCommon
+ #27 _BlockUntilNextEventMatchingListInModeWithFilter
+ #28 _DPSNextEvent
+ #29 -[NSApplication(NSEventRouting) _nextEventMatchingEventMask:untilDate:inMode:dequeue:]
+ #30 -[NSApplication run]
+ #31 NSApplicationMain
+ #32 EditorMain(int, char const**)
+ #33 main
+ #34 start
+
+Refreshing native plugins compatible for Editor in 2.51 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 4285 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 53 unused Assets / (44.4 KB). Loaded Objects now: 4844.
+Memory consumption went from 249.8 MB to 249.7 MB.
+Total: 3.459250 ms (FindLiveObjects: 0.187750 ms CreateObjectMapping: 0.061792 ms MarkObjects: 3.128000 ms  DeleteObjects: 0.080834 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+AssetImportParameters requested are different than current active one (requested -> active):
+  custom:container-demuxer-ogg: 62fdf1f143b41e24485cea50d1cbac27 -> 
+  custom:video-decoder-ogg-theora: a1e56fd34408186e4bbccfd4996cb3dc -> 
+  custom:container-demuxer-webm: 4f35f7cbe854078d1ac9338744f61a02 -> 
+  custom:container-muxer-webm: aa71ff27fc2769a1b78a27578f13a17b -> 
+  custom:video-decoder-webm-vp8: 9c59270c3fd7afecdb556c50c9e8de78 -> 
+  custom:AudioImporter_EditorPlatform: 3918e3fc78b5a79bad01e8451be0beb8 -> 
+  custom:framework-osx-AVFoundation: e770b220cccbd017edd2c1fefb359320 -> 
+  custom:video-encoder-webm-vp8: eb34c28f22e8b96e1ab97ce403110664 -> 
+  custom:audio-decoder-ogg-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+  custom:audio-encoder-webm-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+Thread 0x16fd3f000 may have been prematurely finalized
+Symbol file LoadedFromMemory doesn't match image /Users/mahmoudelbahkiry/Desktop/Project-BlinkTap/UnityImplementations/Library/PackageCache/com.unity.visualscripting@1.8.0/Editor/VisualScripting.Core/Dependencies/YamlDotNet/Unity.VisualScripting.YamlDotNet.dll
+Symbol file LoadedFromMemory doesn't match image /Users/mahmoudelbahkiry/Desktop/Project-BlinkTap/UnityImplementations/Library/PackageCache/com.unity.visualscripting@1.8.0/Editor/VisualScripting.Core/Dependencies/DotNetZip/Unity.VisualScripting.IonicZip.dll
+Symbol file LoadedFromMemory is not a mono symbol file
+- Loaded All Assemblies, in  0.520 seconds
+Refreshing native plugins compatible for Editor in 2.22 ms, found 3 plugins.
+Native extension for iOS target not found
+Native extension for OSXStandalone target not found
+Mono: successfully reloaded assembly
+[Package Manager] Server::EnsureServerProcessIsRunning -- launch failed, reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] UpmClient::Send -- Unable to send message (not connected to UPM process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+- Finished resetting the current domain, in  0.842 seconds
+Domain Reload Profiling:
+	ReloadAssembly (165ms)
+		BeginReloadAssembly (119ms)
+			ExecutionOrderSort (0ms)
+			DisableScriptedObjects (9ms)
+			BackupInstance (0ms)
+			ReleaseScriptingObjects (0ms)
+			CreateAndSetChildDomain (54ms)
+		LoadAllAssembliesAndSetupDomain (354ms)
+			LoadAssemblies (168ms)
+			RebuildTransferFunctionScriptingTraits (0ms)
+			SetupTypeCache (219ms)
+				TypeCache.Initialize (215ms)
+					TypeCache.ScanAssembly (211ms)
+				ResolveRequiredComponents (4ms)
+		FinalizeReload (0ms)
+			ReleaseScriptCaches (0ms)
+			RebuildScriptCaches (0ms)
+			SetupLoadedEditorAssemblies (266ms)
+				LogAssemblyErrors (0ms)
+				InitializePlatformSupportModulesInManaged (18ms)
+				SetLoadedEditorAssemblies (3ms)
+				RefreshPlugins (0ms)
+				BeforeProcessingInitializeOnLoad (48ms)
+				ProcessInitializeOnLoadAttributes (180ms)
+				ProcessInitializeOnLoadMethodAttributes (17ms)
+				AfterProcessingInitializeOnLoad (1ms)
+				EditorAssembliesLoaded (0ms)
+			ExecutionOrderSort2 (0ms)
+			AwakeInstancesAfterBackupRestoration (6ms)
+Assertion failed on expression: 'res'
+ #0 GetStacktrace(int)
+ #1 DebugStringToFile(DebugStringToFileData const&)
+ #2 AssertImplementation(int, char const*, int, int, char const*)
+ #3 FileCacherRead::RequestBlock(int)
+ #4 FileCacherRead::LockCacheBlock(unsigned long, unsigned char**, unsigned char**)
+ #5 ReadFileCache(CacheReaderBase&, void*, VFS::FileSize, unsigned long)
+ #6 SerializedFile::FinalizeInitRead(TransferInstructionFlags)
+ #7 SerializedFile::InitializeRead(core::basic_string<char, core::StringStorageDefault<char>> const&, ResourceImageGroup&, unsigned long, bool, TransferInstructionFlags, VFS::FileSize, VFS::FileSize, CacheReaderBase*)
+ #8 PersistentManager::GetStreamNameSpaceInternal(int)
+ #9 PersistentManager::GetSerializedFileIfObjectAvailable(int, long long, PersistentManager::LockFlags)
+ #10 PersistentManager::ReadAndActivateObjectThreaded(int, SerializedObjectIdentifier const&, SerializedFile*, bool, bool, PersistentManager::LockFlags)
+ #11 PersistentManager::ReadObjectThreaded(int, PersistentManager::LockFlags)
+ #12 PersistentManager::ReadObject(int, AwakeFromLoadMode)
+ #13 PPtr<Object>::operator Object*() const
+ #14 AssetImportWorkerClient::RegisterAvailableScripts(AssetResolver&)
+ #15 AssetImportWorkerClient::ReloadMonoDomain(AssetResolver&)
+ #16 invocation function for block in AssetImportWorkerClient::HandleMessage(PrepareMessage const&)::$_4::operator()() const
+ #17 _dispatch_client_callout
+ #18 _dispatch_async_and_wait_invoke
+ #19 _dispatch_client_callout
+ #20 _dispatch_main_queue_drain
+ #21 _dispatch_main_queue_callback_4CF
+ #22 __CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE__
+ #23 __CFRunLoopRun
+ #24 CFRunLoopRunSpecific
+ #25 RunCurrentEventLoopInMode
+ #26 ReceiveNextEventCommon
+ #27 _BlockUntilNextEventMatchingListInModeWithFilter
+ #28 _DPSNextEvent
+ #29 -[NSApplication(NSEventRouting) _nextEventMatchingEventMask:untilDate:inMode:dequeue:]
+ #30 -[NSApplication run]
+ #31 NSApplicationMain
+ #32 EditorMain(int, char const**)
+ #33 main
+ #34 start
+
+Refreshing native plugins compatible for Editor in 2.17 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 4285 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 53 unused Assets / (44.5 KB). Loaded Objects now: 4848.
+Memory consumption went from 255.1 MB to 255.0 MB.
+Total: 3.095416 ms (FindLiveObjects: 0.159959 ms CreateObjectMapping: 0.057083 ms MarkObjects: 2.795708 ms  DeleteObjects: 0.082041 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+AssetImportParameters requested are different than current active one (requested -> active):
+  custom:container-demuxer-ogg: 62fdf1f143b41e24485cea50d1cbac27 -> 
+  custom:video-decoder-ogg-theora: a1e56fd34408186e4bbccfd4996cb3dc -> 
+  custom:container-demuxer-webm: 4f35f7cbe854078d1ac9338744f61a02 -> 
+  custom:container-muxer-webm: aa71ff27fc2769a1b78a27578f13a17b -> 
+  custom:video-decoder-webm-vp8: 9c59270c3fd7afecdb556c50c9e8de78 -> 
+  custom:AudioImporter_EditorPlatform: 3918e3fc78b5a79bad01e8451be0beb8 -> 
+  custom:framework-osx-AVFoundation: e770b220cccbd017edd2c1fefb359320 -> 
+  custom:video-encoder-webm-vp8: eb34c28f22e8b96e1ab97ce403110664 -> 
+  custom:audio-decoder-ogg-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+  custom:audio-encoder-webm-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+========================================================================
+Received Import Request.
+  Time since last request: 2610.882159 seconds.
+  path: Assets/Scenes/Multiplayer.unity
+  artifactKey: Guid(76702acfc0ee64583be07113448a77d2) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scenes/Multiplayer.unity using Guid(76702acfc0ee64583be07113448a77d2) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'a7262c3d2416cfa297ac1ea7d6c0bb94') in 0.004214 seconds
+Number of updated asset objects reloaded before import = 0
+Number of asset objects unloaded after import = 0
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+Thread 0x16fd3f000 may have been prematurely finalized
+Symbol file LoadedFromMemory doesn't match image /Users/mahmoudelbahkiry/Desktop/Project-BlinkTap/UnityImplementations/Library/PackageCache/com.unity.visualscripting@1.8.0/Editor/VisualScripting.Core/Dependencies/YamlDotNet/Unity.VisualScripting.YamlDotNet.dll
+Symbol file LoadedFromMemory doesn't match image /Users/mahmoudelbahkiry/Desktop/Project-BlinkTap/UnityImplementations/Library/PackageCache/com.unity.visualscripting@1.8.0/Editor/VisualScripting.Core/Dependencies/DotNetZip/Unity.VisualScripting.IonicZip.dll
+Symbol file LoadedFromMemory is not a mono symbol file
+- Loaded All Assemblies, in  0.511 seconds
+Refreshing native plugins compatible for Editor in 4.36 ms, found 3 plugins.
+Native extension for iOS target not found
+Native extension for OSXStandalone target not found
+Mono: successfully reloaded assembly
+[Package Manager] Server::EnsureServerProcessIsRunning -- launch failed, reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] UpmClient::Send -- Unable to send message (not connected to UPM process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+- Finished resetting the current domain, in  0.834 seconds
+Domain Reload Profiling:
+	ReloadAssembly (167ms)
+		BeginReloadAssembly (120ms)
+			ExecutionOrderSort (0ms)
+			DisableScriptedObjects (9ms)
+			BackupInstance (0ms)
+			ReleaseScriptingObjects (0ms)
+			CreateAndSetChildDomain (56ms)
+		LoadAllAssembliesAndSetupDomain (345ms)
+			LoadAssemblies (161ms)
+			RebuildTransferFunctionScriptingTraits (0ms)
+			SetupTypeCache (215ms)
+				TypeCache.Initialize (211ms)
+					TypeCache.ScanAssembly (207ms)
+				ResolveRequiredComponents (3ms)
+		FinalizeReload (0ms)
+			ReleaseScriptCaches (0ms)
+			RebuildScriptCaches (0ms)
+			SetupLoadedEditorAssemblies (261ms)
+				LogAssemblyErrors (0ms)
+				InitializePlatformSupportModulesInManaged (19ms)
+				SetLoadedEditorAssemblies (3ms)
+				RefreshPlugins (0ms)
+				BeforeProcessingInitializeOnLoad (43ms)
+				ProcessInitializeOnLoadAttributes (179ms)
+				ProcessInitializeOnLoadMethodAttributes (18ms)
+				AfterProcessingInitializeOnLoad (1ms)
+				EditorAssembliesLoaded (0ms)
+			ExecutionOrderSort2 (0ms)
+			AwakeInstancesAfterBackupRestoration (6ms)
+Assertion failed on expression: 'res'
+ #0 GetStacktrace(int)
+ #1 DebugStringToFile(DebugStringToFileData const&)
+ #2 AssertImplementation(int, char const*, int, int, char const*)
+ #3 FileCacherRead::RequestBlock(int)
+ #4 FileCacherRead::LockCacheBlock(unsigned long, unsigned char**, unsigned char**)
+ #5 ReadFileCache(CacheReaderBase&, void*, VFS::FileSize, unsigned long)
+ #6 SerializedFile::FinalizeInitRead(TransferInstructionFlags)
+ #7 SerializedFile::InitializeRead(core::basic_string<char, core::StringStorageDefault<char>> const&, ResourceImageGroup&, unsigned long, bool, TransferInstructionFlags, VFS::FileSize, VFS::FileSize, CacheReaderBase*)
+ #8 PersistentManager::GetStreamNameSpaceInternal(int)
+ #9 PersistentManager::GetSerializedFileIfObjectAvailable(int, long long, PersistentManager::LockFlags)
+ #10 PersistentManager::ReadAndActivateObjectThreaded(int, SerializedObjectIdentifier const&, SerializedFile*, bool, bool, PersistentManager::LockFlags)
+ #11 PersistentManager::ReadObjectThreaded(int, PersistentManager::LockFlags)
+ #12 PersistentManager::ReadObject(int, AwakeFromLoadMode)
+ #13 PPtr<Object>::operator Object*() const
+ #14 AssetImportWorkerClient::RegisterAvailableScripts(AssetResolver&)
+ #15 AssetImportWorkerClient::ReloadMonoDomain(AssetResolver&)
+ #16 invocation function for block in AssetImportWorkerClient::HandleMessage(PrepareMessage const&)::$_4::operator()() const
+ #17 _dispatch_client_callout
+ #18 _dispatch_async_and_wait_invoke
+ #19 _dispatch_client_callout
+ #20 _dispatch_main_queue_drain
+ #21 _dispatch_main_queue_callback_4CF
+ #22 __CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE__
+ #23 __CFRunLoopRun
+ #24 CFRunLoopRunSpecific
+ #25 RunCurrentEventLoopInMode
+ #26 ReceiveNextEventCommon
+ #27 _BlockUntilNextEventMatchingListInModeWithFilter
+ #28 _DPSNextEvent
+ #29 -[NSApplication(NSEventRouting) _nextEventMatchingEventMask:untilDate:inMode:dequeue:]
+ #30 -[NSApplication run]
+ #31 NSApplicationMain
+ #32 EditorMain(int, char const**)
+ #33 main
+ #34 start
+
+Refreshing native plugins compatible for Editor in 2.60 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 4284 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 53 unused Assets / (44.5 KB). Loaded Objects now: 4852.
+Memory consumption went from 260.3 MB to 260.2 MB.
+Total: 3.225792 ms (FindLiveObjects: 0.189375 ms CreateObjectMapping: 0.065292 ms MarkObjects: 2.880125 ms  DeleteObjects: 0.089875 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+AssetImportParameters requested are different than current active one (requested -> active):
+  custom:container-demuxer-ogg: 62fdf1f143b41e24485cea50d1cbac27 -> 
+  custom:video-decoder-ogg-theora: a1e56fd34408186e4bbccfd4996cb3dc -> 
+  custom:container-demuxer-webm: 4f35f7cbe854078d1ac9338744f61a02 -> 
+  custom:container-muxer-webm: aa71ff27fc2769a1b78a27578f13a17b -> 
+  custom:video-decoder-webm-vp8: 9c59270c3fd7afecdb556c50c9e8de78 -> 
+  custom:AudioImporter_EditorPlatform: 3918e3fc78b5a79bad01e8451be0beb8 -> 
+  custom:framework-osx-AVFoundation: e770b220cccbd017edd2c1fefb359320 -> 
+  custom:video-encoder-webm-vp8: eb34c28f22e8b96e1ab97ce403110664 -> 
+  custom:audio-decoder-ogg-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+  custom:audio-encoder-webm-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 

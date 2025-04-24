@@ -16,6 +16,7 @@ public class MultiplayerManager : MonoBehaviour
     [SerializeField] private float countdownDuration = 3f;
 
     [Header("Player UI")]
+    [SerializeField] private GameObject playerScoresPanel;
     [SerializeField] private TextMeshProUGUI player1NameText;
     [SerializeField] private TextMeshProUGUI player2NameText;
     [SerializeField] private TextMeshProUGUI player1ScoreText;
@@ -123,6 +124,18 @@ public class MultiplayerManager : MonoBehaviour
 
     private void Start()
     {
+        // Hide the divider line initially
+        if (dividerLine != null)
+        {
+            dividerLine.gameObject.SetActive(false);
+        }
+
+        // Hide player scores panel initially
+        if (playerScoresPanel != null)
+        {
+            playerScoresPanel.SetActive(false);
+        }
+
         // Ensure the CircleSpawners don't spawn circles at start
         if (player1CircleSpawner != null)
         {
@@ -369,6 +382,18 @@ public class MultiplayerManager : MonoBehaviour
     {
         Debug.Log("MultiplayerManager: StartTest called - Starting the test now");
 
+        // Show the divider line now that the game is starting
+        if (dividerLine != null)
+        {
+            dividerLine.gameObject.SetActive(true);
+        }
+
+        // Show player scores panel
+        if (playerScoresPanel != null)
+        {
+            playerScoresPanel.SetActive(true);
+        }
+
         // Start the timer manager
         if (timerManager != null)
         {
@@ -383,6 +408,12 @@ public class MultiplayerManager : MonoBehaviour
     // Call this when the test is completed
     public void OnTestCompleted()
     {
+        // Hide player scores panel
+        if (playerScoresPanel != null)
+        {
+            playerScoresPanel.SetActive(false);
+        }
+
         ShowResultsPopup();
     }
 
@@ -449,6 +480,18 @@ public class MultiplayerManager : MonoBehaviour
 
     private void OnRestartClicked()
     {
+        // Hide the divider line when restarting
+        if (dividerLine != null)
+        {
+            dividerLine.gameObject.SetActive(false);
+        }
+
+        // Make sure player scores panel is hidden
+        if (playerScoresPanel != null)
+        {
+            playerScoresPanel.SetActive(false);
+        }
+
         // Hide results popup
         if (resultsPopup != null)
         {
