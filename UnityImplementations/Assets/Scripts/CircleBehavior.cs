@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI; // Add UI namespace
-using UnityEngine.EventSystems; // Required for event handling
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class CircleBehavior : MonoBehaviour, IPointerClickHandler
 {
@@ -13,24 +13,40 @@ public class CircleBehavior : MonoBehaviour, IPointerClickHandler
     private int currentTaps = 0;
     private int requiredTaps = 1;
     private Image circleImage;
+    private TestTimerManager testManager;
+    private bool tagSet = false;
 
     private void Start()
     {
-        // Record spawn time
         spawnTime = Time.time;
 
-        // Destroy the circle after its lifetime
         Destroy(gameObject, lifetime);
 
-        // Get the Image component
         circleImage = GetComponent<Image>();
 
-        // Set required taps based on color
+        // Find the test manager once at start
+        testManager = FindObjectOfType<TestTimerManager>();
+        if (testManager == null)
+        {
+            Debug.LogWarning("CircleBehavior: TestTimerManager not found in scene!");
+        }
+
+        // Try to set the tag, but don't crash if it doesn't exist
+        try
+        {
+            gameObject.tag = "Circle";
+            tagSet = true;
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning("CircleBehavior: Cannot set tag 'Circle': " + e.Message);
+            tagSet = false;
+        }
+
         if (circleImage != null)
         {
             Color circleColor = circleImage.color;
 
-            // Check color and set required taps
             if (IsColorSimilar(circleColor, Color.red))
             {
                 requiredTaps = 1;
@@ -45,14 +61,13 @@ public class CircleBehavior : MonoBehaviour, IPointerClickHandler
             }
             else
             {
-                requiredTaps = 1; // Default for any other colors
+                requiredTaps = 1;
             }
 
-            Debug.Log($"Circle spawned with color {circleColor}, requiring {requiredTaps} taps");
+            Debug.Log($"CircleBehavior: Circle spawned with color {circleColor}, requiring {requiredTaps} taps");
         }
     }
 
-    // Helper method to compare colors with a tolerance
     private bool IsColorSimilar(Color a, Color b, float tolerance = 0.1f)
     {
         return Mathf.Abs(a.r - b.r) < tolerance &&
@@ -60,46 +75,64 @@ public class CircleBehavior : MonoBehaviour, IPointerClickHandler
                Mathf.Abs(a.b - b.b) < tolerance;
     }
 
-    // Implement the OnPointerClick method from IPointerClickHandler
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (!destroyed)
+        // First check if we're already destroyed
+        if (destroyed)
         {
-            currentTaps++;
-            Debug.Log($"Circle tapped! Current taps: {currentTaps}/{requiredTaps}");
+            return;
+        }
 
-            // Only destroy the circle and record reaction time when we reach the required taps
-            if (currentTaps >= requiredTaps)
+        // Check if test is active - ignore clicks if not in progress
+        // Use cached reference to test manager or try to find it if null
+        if (testManager == null)
+        {
+            testManager = FindObjectOfType<TestTimerManager>();
+        }
+
+        bool testActive = testManager != null && testManager.IsTestActive();
+
+        // If test is not active, ignore click
+        if (!testActive)
+        {
+            Debug.Log("CircleBehavior: Click ignored - test not active");
+            return;
+        }
+
+        // Process the tap
+        currentTaps++;
+        Debug.Log($"CircleBehavior: Circle tapped! Current taps: {currentTaps}/{requiredTaps}");
+
+        if (currentTaps >= requiredTaps)
+        {
+            destroyed = true;
+
+            float reactionTimeInSeconds = Time.time - spawnTime;
+            int reactionTimeInMS = Mathf.RoundToInt(reactionTimeInSeconds * 1000);
+
+            if (ReactionTimeManager.Instance != null)
             {
-                destroyed = true;
-
-                // Calculate reaction time in milliseconds
-                float reactionTimeInSeconds = Time.time - spawnTime;
-                int reactionTimeInMS = Mathf.RoundToInt(reactionTimeInSeconds * 1000);
-
-                // Pass the reaction time to the ReactionTimeManager
                 ReactionTimeManager.Instance.AddReactionTime(reactionTimeInMS);
-
-                // Log for debugging
-                Debug.Log($"Circle completed with {requiredTaps} taps! Reaction time: {reactionTimeInMS} ms");
-
-                // Destroy the circle
-                Destroy(gameObject);
+                Debug.Log($"CircleBehavior: Circle completed with {requiredTaps} taps! Reaction time: {reactionTimeInMS} ms");
             }
             else
             {
-                // Visual feedback for partial taps (optional)
-                if (circleImage != null)
-                {
-                    // Slightly darken the circle to indicate progress
-                    float darkenAmount = 0.2f * currentTaps / requiredTaps;
-                    circleImage.color = new Color(
-                        circleImage.color.r - darkenAmount,
-                        circleImage.color.g - darkenAmount,
-                        circleImage.color.b - darkenAmount,
-                        circleImage.color.a
-                    );
-                }
+                Debug.LogWarning("CircleBehavior: ReactionTimeManager not found - couldn't record reaction time");
+            }
+
+            Destroy(gameObject);
+        }
+        else
+        {
+            if (circleImage != null)
+            {
+                float darkenAmount = 0.2f * currentTaps / requiredTaps;
+                circleImage.color = new Color(
+                    circleImage.color.r - darkenAmount,
+                    circleImage.color.g - darkenAmount,
+                    circleImage.color.b - darkenAmount,
+                    circleImage.color.a
+                );
             }
         }
     }

@@ -16,14 +16,15 @@ public class ChallengePanelController : MonoBehaviour
     // References
     private UIElementStyler styler;
     private MainMenuManager menuManager;
+    private FirebaseManager firebaseManager;
 
     [Header("Challenge Data")]
     [SerializeField] private string challengeTitle = "Today's Challenge";
     [SerializeField] private int personalBest = 198;
+    private bool isFetchingBestScore = false;
 
     private void Awake()
     {
-        // Try to find references if not assigned
         if (backgroundPanel == null)
             backgroundPanel = GetComponent<Image>();
 
@@ -42,62 +43,197 @@ public class ChallengePanelController : MonoBehaviour
 
     void Start()
     {
-        // Find references in scene
+        Debug.Log($"ChallengePanelController: Starting initialization on GameObject: {gameObject.name}");
+
         if (styler == null)
             styler = FindObjectOfType<UIElementStyler>();
 
         if (menuManager == null)
             menuManager = FindObjectOfType<MainMenuManager>();
 
-        // Apply initial settings
+        if (firebaseManager == null)
+        {
+            firebaseManager = FirebaseManager.Instance;
+            Debug.Log("ChallengePanelController: FirebaseManager instance obtained");
+        }
+
+        // Debug the hierarchy to help find the BestScoreText
+        Debug.Log($"ChallengePanelController: GameObject path: {GetGameObjectPath(gameObject)}");
+
+        // Double-check the bestScoreText reference
+        if (bestScoreText == null)
+        {
+            Debug.LogWarning("ChallengePanelController: bestScoreText is null, trying to find it again...");
+
+            // Try direct path first
+            bestScoreText = transform.Find("BestScore")?.GetComponent<TextMeshProUGUI>();
+
+            // If still null, try a more comprehensive search
+            if (bestScoreText == null)
+            {
+                Debug.LogWarning("ChallengePanelController: Still couldn't find by direct path, trying GetComponentInChildren...");
+                // Search in children
+                bestScoreText = GetComponentInChildren<TextMeshProUGUI>(true);
+
+                // If we found any TextMeshProUGUI component, log it
+                if (bestScoreText != null)
+                {
+                    Debug.Log($"ChallengePanelController: Found a TextMeshProUGUI component: {bestScoreText.name} with text: {bestScoreText.text}");
+                }
+
+                // Search for any TMPro components
+                TextMeshProUGUI[] allTexts = GetComponentsInChildren<TextMeshProUGUI>(true);
+                Debug.Log($"ChallengePanelController: Found {allTexts.Length} TextMeshProUGUI components:");
+                foreach (TextMeshProUGUI text in allTexts)
+                {
+                    Debug.Log($"  - {GetGameObjectPath(text.gameObject)}: '{text.text}'");
+                    // If any of them have "best" in their name or text, use it
+                    if (text.name.ToLower().Contains("best") || text.text.ToLower().Contains("best"))
+                    {
+                        bestScoreText = text;
+                        Debug.Log($"ChallengePanelController: Found likely best score text: {text.name}");
+                    }
+                }
+            }
+        }
+        else
+        {
+            Debug.Log($"ChallengePanelController: bestScoreText is assigned: {bestScoreText.name} with text: {bestScoreText.text}");
+        }
+
+        // Show default panel while we fetch the best score
         SetupChallengePanel();
 
-        // Add button listener
+        // Fetch the best score from Firebase
+        FetchBestScore();
+
         if (startButton != null)
         {
             startButton.onClick.AddListener(OnStartButtonClicked);
         }
     }
 
+    private void FetchBestScore()
+    {
+        if (isFetchingBestScore || firebaseManager == null)
+            return;
+
+        isFetchingBestScore = true;
+        Debug.Log("ChallengePanelController: Starting to fetch best score...");
+
+        firebaseManager.GetBestScore((bestScore) =>
+        {
+            isFetchingBestScore = false;
+
+            if (bestScore > 0)
+            {
+                // Only update if we got a valid score
+                Debug.Log($"ChallengePanelController: Best score received from Firebase: {bestScore}ms");
+                personalBest = bestScore;
+                // Force update in the next frame
+                StartCoroutine(UpdateTextNextFrame());
+            }
+            else
+            {
+                Debug.Log("ChallengePanelController: No best score found or not logged in");
+            }
+        });
+    }
+
+    private IEnumerator UpdateTextNextFrame()
+    {
+        yield return null; // Wait for next frame
+        Debug.Log($"ChallengePanelController: Updating best score text to: {personalBest}ms");
+
+        if (bestScoreText == null)
+        {
+            Debug.LogError("ChallengePanelController: bestScoreText is null! Cannot update UI.");
+            // Try to find it again
+            bestScoreText = transform.Find("BestScore")?.GetComponent<TextMeshProUGUI>();
+            if (bestScoreText == null)
+            {
+                Debug.LogError("ChallengePanelController: Still couldn't find bestScoreText component!");
+                yield break;
+            }
+        }
+
+        UpdateBestScoreText();
+        Debug.Log($"ChallengePanelController: Text updated successfully to: {bestScoreText.text}");
+    }
+
     public void SetupChallengePanel()
     {
-        // Set text values
         if (titleText != null)
         {
             titleText.text = challengeTitle;
         }
 
-        if (bestScoreText != null)
-        {
-            bestScoreText.text = "Beat your personal best: " + personalBest + "ms";
-        }
+        UpdateBestScoreText();
 
         if (startButtonText != null)
         {
             startButtonText.text = "START";
         }
 
-        // Apply styling
         if (styler != null)
         {
             styler.StyleChallengePanel(backgroundPanel, titleText, bestScoreText, null, startButton);
         }
     }
 
-    // Update challenge data
+    private void UpdateBestScoreText()
+    {
+        if (bestScoreText != null)
+        {
+            bestScoreText.text = "Beat your personal best: " + personalBest + "ms";
+
+            // Set the font size to make it larger
+            bestScoreText.fontSize = 30f; // Adjust this value to your preference
+
+            // Make it bold for better visibility
+            bestScoreText.fontStyle = TMPro.FontStyles.Bold;
+
+            // Optional: Add color highlighting for the score itself
+            bestScoreText.text = $"Beat your personal best: <color=#00CCFF>{personalBest}</color>ms";
+
+            // Optional: Add a slight character spacing for better readability
+            bestScoreText.characterSpacing = 1f;
+
+            // Optional: Set alignment to center for better appearance
+            bestScoreText.alignment = TMPro.TextAlignmentOptions.Center;
+
+            Debug.Log($"ChallengePanelController: Updated best score text: {bestScoreText.text}, Font size: {bestScoreText.fontSize}");
+        }
+        else
+        {
+            Debug.LogError("ChallengePanelController: bestScoreText is null in UpdateBestScoreText!");
+        }
+    }
+
     public void UpdateChallengeData(int newPersonalBest)
     {
         personalBest = newPersonalBest;
-        SetupChallengePanel();
+        UpdateBestScoreText();
     }
 
     private void OnStartButtonClicked()
     {
-        // Forward event to menu manager
         if (menuManager != null)
         {
             Debug.Log("Starting today's challenge");
-            // Call method on menu manager - this would likely be handled by an event
         }
+    }
+
+    // Helper method to get the full path of a GameObject
+    private string GetGameObjectPath(GameObject obj)
+    {
+        string path = obj.name;
+        Transform parent = obj.transform.parent;
+        while (parent != null)
+        {
+            path = parent.name + "/" + path;
+            parent = parent.parent;
+        }
+        return path;
     }
 }

@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI; // Add UI namespace for Image component
+using UnityEngine.UI;
 
 public class CircleSpawner : MonoBehaviour
 {
@@ -12,25 +12,25 @@ public class CircleSpawner : MonoBehaviour
     [SerializeField] private float circleSize = 1f;
 
     [Header("Spawn Area")]
-    [SerializeField] private RectTransform spawnAreaRect; // Reference to the RectTransform for spawning
+    [SerializeField] private RectTransform spawnAreaRect;
 
-    // Available colors for spawned circles with their corresponding tap requirements
     private Color[] circleColors = new Color[]
     {
-        Color.red,    // 1 tap
-        Color.blue,   // 2 taps
-        Color.green   // 3 taps
+        Color.red,
+        Color.blue,
+        Color.green
     };
 
-    // Text to display on the UI about tap requirements
     [Header("UI Information")]
     [SerializeField] private bool showDebugLogs = true;
     [SerializeField] private bool showInstructionsPanel = true;
-    [SerializeField] private Transform canvasTransform; // Reference to the Canvas where UI will be created
+    [SerializeField] private Transform canvasTransform;
+
+    private Coroutine spawnCoroutine = null;
+    private bool isSpawning = false;
 
     private void Start()
     {
-        // If no spawn area is assigned, use this object's RectTransform
         if (spawnAreaRect == null)
         {
             spawnAreaRect = GetComponent<RectTransform>();
@@ -41,73 +41,109 @@ public class CircleSpawner : MonoBehaviour
             }
         }
 
-        // Create instructions panel if enabled
         if (showInstructionsPanel)
         {
             CreateInstructionsPanel();
         }
 
-        // Start spawning circles
-        StartCoroutine(SpawnCircles());
+        // Explicitly disable spawning at start
+        isSpawning = false;
+        spawnCoroutine = null;
 
-        // Debug log to verify the script is running
-        Debug.Log("CircleSpawner started - should begin spawning circles");
+        Debug.Log("CircleSpawner initialized - explicitly NOT spawning at start");
+    }
+
+    private void OnDisable()
+    {
+        // Make sure to stop when disabled
+        StopSpawning();
+    }
+
+    private void OnDestroy()
+    {
+        // Make sure to stop when destroyed
+        StopSpawning();
+    }
+
+    public void StartSpawning()
+    {
+        if (!isSpawning)
+        {
+            isSpawning = true;
+            if (spawnCoroutine != null)
+            {
+                StopCoroutine(spawnCoroutine);
+            }
+            spawnCoroutine = StartCoroutine(SpawnCircles());
+            Debug.Log("Circle spawning STARTED - Spawner:" + gameObject.name);
+        }
+    }
+
+    public void StopSpawning()
+    {
+        if (spawnCoroutine != null)
+        {
+            StopCoroutine(spawnCoroutine);
+            spawnCoroutine = null;
+        }
+        isSpawning = false;
+        Debug.Log("Circle spawning STOPPED - Spawner:" + gameObject.name);
     }
 
     private IEnumerator SpawnCircles()
     {
-        while (true)
+        Debug.Log("SpawnCircles coroutine started");
+        while (isSpawning) // Only continue if spawning is active
         {
-            // Wait for a random time between min and max spawn interval
             float waitTime = Random.Range(minSpawnInterval, maxSpawnInterval);
             yield return new WaitForSeconds(waitTime);
 
-            // Spawn a circle
-            SpawnCircle();
-
-            // Debug log to verify circles are being spawned
-            Debug.Log("Spawning a new circle");
+            // Double-check we're still supposed to be spawning
+            if (isSpawning && this.enabled && this.gameObject.activeInHierarchy)
+            {
+                SpawnCircle();
+                Debug.Log("Spawned a circle - isSpawning: " + isSpawning);
+            }
+            else
+            {
+                Debug.Log("Skipped spawning - isSpawning: " + isSpawning);
+            }
         }
+        Debug.Log("SpawnCircles coroutine ended");
     }
 
     private void SpawnCircle()
     {
-        // Check if prefab is assigned
         if (circlePrefab == null)
         {
             Debug.LogError("Circle prefab is not assigned to the CircleSpawner!");
             return;
         }
 
-        // Calculate random position within the spawn area (RectTransform)
         float randomX = Random.Range(-spawnAreaRect.rect.width / 2, spawnAreaRect.rect.width / 2);
         float randomY = Random.Range(-spawnAreaRect.rect.height / 2, spawnAreaRect.rect.height / 2);
         Vector3 spawnPosition = new Vector3(randomX, randomY, 0);
 
-        // Instantiate the circle
         GameObject circleObject = Instantiate(circlePrefab, spawnAreaRect);
 
-        // Position the circle within the parent
         RectTransform circleRect = circleObject.GetComponent<RectTransform>();
         if (circleRect != null)
         {
             circleRect.anchoredPosition = new Vector2(randomX, randomY);
         }
 
-        // Set random color
         int colorIndex = Random.Range(0, circleColors.Length);
         Image imageRenderer = circleObject.GetComponent<Image>();
         if (imageRenderer != null)
         {
             imageRenderer.color = circleColors[colorIndex];
 
-            // Determine required taps based on color
-            int requiredTaps = 1; // Default
-            if (colorIndex == 0) // Red
+            int requiredTaps = 1;
+            if (colorIndex == 0)
                 requiredTaps = 1;
-            else if (colorIndex == 1) // Blue
+            else if (colorIndex == 1)
                 requiredTaps = 2;
-            else if (colorIndex == 2) // Green
+            else if (colorIndex == 2)
                 requiredTaps = 3;
 
             if (showDebugLogs)
@@ -120,13 +156,11 @@ public class CircleSpawner : MonoBehaviour
             Debug.LogWarning("No Image component found on the circle prefab!");
         }
 
-        // Set size
         if (circleRect != null)
         {
             circleRect.localScale = new Vector3(circleSize, circleSize, 1f);
         }
 
-        // Add the CircleBehavior component if it doesn't already exist
         CircleBehavior circleBehavior = circleObject.GetComponent<CircleBehavior>();
         if (circleBehavior == null)
         {
@@ -134,7 +168,6 @@ public class CircleSpawner : MonoBehaviour
         }
     }
 
-    // Helper method to get color name from index
     private string GetColorName(int colorIndex)
     {
         switch (colorIndex)
@@ -146,33 +179,27 @@ public class CircleSpawner : MonoBehaviour
         }
     }
 
-    // Create a UI panel showing the tap requirements for each color
     private void CreateInstructionsPanel()
     {
-        // Make sure we have a canvas reference
         if (canvasTransform == null)
         {
             Debug.LogWarning("Canvas Transform not assigned for instructions panel");
             return;
         }
 
-        // Create a panel GameObject
         GameObject panelGO = new GameObject("TapInstructionsPanel");
         panelGO.transform.SetParent(canvasTransform, false);
 
-        // Add UI components
         RectTransform panelRect = panelGO.AddComponent<RectTransform>();
         Image panelImage = panelGO.AddComponent<Image>();
 
-        // Configure panel
         panelRect.anchorMin = new Vector2(0, 1);
         panelRect.anchorMax = new Vector2(0, 1);
         panelRect.pivot = new Vector2(0, 1);
         panelRect.anchoredPosition = new Vector2(10, -10);
         panelRect.sizeDelta = new Vector2(200, 120);
-        panelImage.color = new Color(0, 0, 0, 0.7f); // Semi-transparent black
+        panelImage.color = new Color(0, 0, 0, 0.7f);
 
-        // Create title text
         GameObject titleGO = new GameObject("Title");
         titleGO.transform.SetParent(panelRect, false);
         Text titleText = titleGO.AddComponent<Text>();
@@ -188,19 +215,16 @@ public class CircleSpawner : MonoBehaviour
         titleText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
         titleText.fontSize = 18;
 
-        // Create instruction entries for each color
         CreateColorInstruction(panelRect, 0, "Red: 1 tap", Color.red);
         CreateColorInstruction(panelRect, 1, "Blue: 2 taps", Color.blue);
         CreateColorInstruction(panelRect, 2, "Green: 3 taps", Color.green);
     }
 
-    // Helper to create a single color instruction entry
     private void CreateColorInstruction(RectTransform parent, int index, string instruction, Color color)
     {
         GameObject entryGO = new GameObject("Instruction" + index);
         entryGO.transform.SetParent(parent, false);
 
-        // Create horizontal layout
         HorizontalLayoutGroup layout = entryGO.AddComponent<HorizontalLayoutGroup>();
         layout.childControlWidth = false;
         layout.childForceExpandWidth = false;
@@ -214,7 +238,6 @@ public class CircleSpawner : MonoBehaviour
         entryRect.anchoredPosition = new Vector2(0, -35 - (index * 25));
         entryRect.sizeDelta = new Vector2(0, 25);
 
-        // Create color sample
         GameObject colorSampleGO = new GameObject("ColorSample");
         colorSampleGO.transform.SetParent(entryRect, false);
         Image sampleImage = colorSampleGO.AddComponent<Image>();
@@ -222,7 +245,6 @@ public class CircleSpawner : MonoBehaviour
         sampleRect.sizeDelta = new Vector2(20, 20);
         sampleImage.color = color;
 
-        // Create text
         GameObject textGO = new GameObject("Text");
         textGO.transform.SetParent(entryRect, false);
         Text instructionText = textGO.AddComponent<Text>();

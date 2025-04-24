@@ -212,6 +212,137 @@ app.post('/debug/echo', (req, res) => {
   });
 });
 
+// New endpoint to handle score uploads
+app.post('/scores', async (req, res) => {
+  console.log('Received POST /scores request');
+  console.log('Headers:', req.headers);
+  console.log('Body:', req.body);
+  
+  if (!req.body || typeof req.body !== 'object') {
+    console.error('Invalid request body format. Received:', req.body);
+    return res.status(400).json({ error: 'Invalid request body format' });
+  }
+  
+  const { email, averageReactionTime, timestamp } = req.body;
+  
+  if (!email) {
+    console.error('POST /scores - Email is required but was not provided');
+    return res.status(400).json({ error: 'Email is required' });
+  }
+  
+  if (averageReactionTime === undefined) {
+    console.error(`POST /scores - Average reaction time is required but was not provided for email: ${email}`);
+    return res.status(400).json({ error: 'Average reaction time is required' });
+  }
+  
+  console.log(`POST /scores - Received score: ${email}, average reaction time: ${averageReactionTime}ms, timestamp: ${timestamp}`);
+  
+  try {
+    // Get a reference to the scores collection and the user's document
+    const scoresRef = db.collection('scores');
+    const userScoreRef = scoresRef.doc(email);
+    
+    // Get the current document or create it if it doesn't exist
+    const doc = await userScoreRef.get();
+    
+    if (!doc.exists) {
+      // Create a new document for this user
+      console.log(`Creating new scores document for user: ${email}`);
+      
+      await userScoreRef.set({
+        email: email,
+        testResults: [{
+          averageReactionTime: averageReactionTime,
+          timestamp: timestamp || admin.firestore.FieldValue.serverTimestamp()
+        }],
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+      
+      console.log(`Created new scores document for email: ${email}`);
+      return res.status(200).json({ message: 'Score recorded successfully' });
+    } else {
+      // Update existing document by adding new test result
+      console.log(`Updating existing scores document for user: ${email}`);
+      
+      // Get existing data
+      const userData = doc.data();
+      const testResults = userData.testResults || [];
+      
+      // Add new test result
+      testResults.push({
+        averageReactionTime: averageReactionTime,
+        timestamp: timestamp || admin.firestore.FieldValue.serverTimestamp()
+      });
+      
+      // Update the document
+      await userScoreRef.update({
+        testResults: testResults,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+      
+      console.log(`Updated scores for ${email}, total test results: ${testResults.length}`);
+      return res.status(200).json({ message: 'Score recorded successfully' });
+    }
+  } catch (error) {
+    console.error('Error recording score:', error);
+    console.error(error.stack);
+    return res.status(500).json({ error: 'Failed to record score', details: error.message });
+  }
+});
+
+// New endpoint to get the best (lowest) score for a user
+app.get('/best-score', async (req, res) => {
+  const { email } = req.query;
+  
+  if (!email) {
+    console.error('GET /best-score - Email is required but was not provided');
+    return res.status(400).json({ error: 'Email is required' });
+  }
+  
+  console.log(`GET /best-score - Looking up best score for email: ${email}`);
+  
+  try {
+    // Get a reference to the scores collection and the user's document
+    const scoresRef = db.collection('scores');
+    const userScoreRef = scoresRef.doc(email);
+    
+    // Get the current document
+    const doc = await userScoreRef.get();
+    
+    if (!doc.exists) {
+      // No scores found for this user
+      console.log(`No scores found for email: ${email}`);
+      return res.status(200).json({ bestScore: 0 });
+    }
+    
+    // Get user data and test results
+    const userData = doc.data();
+    const testResults = userData.testResults || [];
+    
+    if (testResults.length === 0) {
+      console.log(`No test results found for email: ${email}`);
+      return res.status(200).json({ bestScore: 0 });
+    }
+    
+    // Find the lowest averageReactionTime
+    let bestScore = Number.MAX_VALUE;
+    for (const result of testResults) {
+      if (result.averageReactionTime < bestScore) {
+        bestScore = result.averageReactionTime;
+      }
+    }
+    
+    console.log(`Best score for ${email}: ${bestScore}ms`);
+    return res.status(200).json({ bestScore: Math.round(bestScore) });
+  } catch (error) {
+    console.error('Error getting best score:', error);
+    console.error(error.stack);
+    return res.status(500).json({ error: 'Failed to get best score', details: error.message });
+  }
+});
+
+// Start the server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });

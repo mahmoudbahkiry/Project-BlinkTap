@@ -58,6 +58,9 @@ public class MainMenuInitializer : MonoBehaviour
 
     void Start()
     {
+        // Set the user email in FirebaseManager if it exists
+        InitializeFirebaseManager();
+
         // Find references if not assigned
         if (menuManager == null)
             menuManager = FindObjectOfType<MainMenuManager>();
@@ -115,6 +118,41 @@ public class MainMenuInitializer : MonoBehaviour
                     }
                 }
             }
+        }
+    }
+
+    private void InitializeFirebaseManager()
+    {
+        // Check if the user email is stored in PlayerPrefs
+        if (PlayerPrefs.HasKey("UserEmail"))
+        {
+            string userEmail = PlayerPrefs.GetString("UserEmail");
+
+            // Find or create FirebaseManager
+            FirebaseManager firebaseManager = FindObjectOfType<FirebaseManager>();
+            if (firebaseManager == null)
+            {
+                // Create a new FirebaseManager GameObject
+                GameObject firebaseManagerObj = new GameObject("FirebaseManager");
+                firebaseManager = firebaseManagerObj.AddComponent<FirebaseManager>();
+                DontDestroyOnLoad(firebaseManagerObj);
+            }
+
+            // Set the user email
+            firebaseManager.SetUserEmail(userEmail);
+            Debug.Log($"MainMenuInitializer: FirebaseManager initialized with user email: {userEmail}");
+
+            // Update the welcome message if needed
+            if (welcomeTextDisplay != null)
+            {
+                // Extract username from email (optional)
+                string username = userEmail.Split('@')[0];
+                welcomeTextDisplay.text = "Welcome back, " + username;
+            }
+        }
+        else
+        {
+            Debug.LogWarning("MainMenuInitializer: No user email found in PlayerPrefs");
         }
     }
 
