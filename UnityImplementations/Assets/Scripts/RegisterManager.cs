@@ -54,7 +54,6 @@ public class RegisterManager : MonoBehaviour
         {
             if (autoLoginAfterRegister)
             {
-                // If auto login is enabled, log the user in automatically
                 StartCoroutine(LoginAfterRegister(email, password));
             }
             else
@@ -90,16 +89,13 @@ public class RegisterManager : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            // Store the user's email in PlayerPrefs
             PlayerPrefs.SetString("UserEmail", email);
             PlayerPrefs.Save();
 
-            // Load the main menu scene
             SceneManager.LoadScene(mainMenuSceneName);
         }
         else
         {
-            // If auto login fails, show the login panel
             registerPanel.SetActive(false);
             loginPanel.SetActive(true);
         }

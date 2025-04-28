@@ -46,7 +46,6 @@ public class CircleSpawner : MonoBehaviour
             CreateInstructionsPanel();
         }
 
-        // Explicitly disable spawning at start
         isSpawning = false;
         spawnCoroutine = null;
 
@@ -55,13 +54,11 @@ public class CircleSpawner : MonoBehaviour
 
     private void OnDisable()
     {
-        // Make sure to stop when disabled
         StopSpawning();
     }
 
     private void OnDestroy()
     {
-        // Make sure to stop when destroyed
         StopSpawning();
     }
 
@@ -93,12 +90,11 @@ public class CircleSpawner : MonoBehaviour
     private IEnumerator SpawnCircles()
     {
         Debug.Log("SpawnCircles coroutine started");
-        while (isSpawning) // Only continue if spawning is active
+        while (isSpawning)
         {
             float waitTime = Random.Range(minSpawnInterval, maxSpawnInterval);
             yield return new WaitForSeconds(waitTime);
 
-            // Double-check we're still supposed to be spawning
             if (isSpawning && this.enabled && this.gameObject.activeInHierarchy)
             {
                 SpawnCircle();

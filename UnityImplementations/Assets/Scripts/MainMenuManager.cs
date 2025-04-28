@@ -37,19 +37,16 @@ public class MainMenuManager : MonoBehaviour
     private ProfilePanelController profilePanelController;
 
     [Header("Main Content")]
-    public GameObject contentPanel; // Reference to the main content panel
+    public GameObject contentPanel;
 
-    // Current active tab
     private string currentTab = "Home";
 
-    // Player data
     private string playerName = "John";
     private int personalBest = 198;
     private int reactionTimeChange = 12;
     private string playerEmail = "john.doe@example.com";
     private string playerProfession = "Sprinters (Track & Field)";
 
-    // List of professions
     private readonly string[] professions = new string[]
     {
         "Boxer",
@@ -76,50 +73,41 @@ public class MainMenuManager : MonoBehaviour
 
     void Start()
     {
-        // Get player email from PlayerPrefs if available
         if (PlayerPrefs.HasKey("UserEmail"))
         {
             playerEmail = PlayerPrefs.GetString("UserEmail");
         }
 
-        // Initialize UI elements
         SetupUserInfo();
         SetupChallengeSection();
         SetupPlayerStats();
         SetupButtons();
         SetupProfilePanel();
 
-        // Initialize tabs
         SwitchTab("Home");
 
-        // Ensure multiplayer button is visible - adding extra redundancy
         if (multiplayerButton != null)
         {
             multiplayerButton.gameObject.SetActive(true);
         }
     }
 
-    // This will run every time the scene is loaded or the GameObject becomes active
     void OnEnable()
     {
         Debug.Log("MainMenuManager: OnEnable called - refreshing stats");
 
-        // First refresh stats with local data
         SetupPlayerStats();
         SetupChallengeSection();
 
-        // Then fetch the latest data from Firebase
         FirebaseManager firebaseManager = FindObjectOfType<FirebaseManager>();
         if (firebaseManager == null)
         {
-            // Create a new FirebaseManager if one doesn't exist
             GameObject firebaseManagerObj = new GameObject("FirebaseManager");
             firebaseManager = firebaseManagerObj.AddComponent<FirebaseManager>();
             DontDestroyOnLoad(firebaseManagerObj);
 
             Debug.Log("MainMenuManager: Created new FirebaseManager instance");
 
-            // Try to set user email from PlayerPrefs
             if (PlayerPrefs.HasKey("UserEmail"))
             {
                 string email = PlayerPrefs.GetString("UserEmail");
@@ -129,26 +117,22 @@ public class MainMenuManager : MonoBehaviour
             else
             {
                 Debug.LogError("MainMenuManager: No UserEmail found in PlayerPrefs!");
-                // Cannot proceed with Firebase operations without an email
                 return;
             }
         }
 
-        // Check if the server is reachable before attempting to fetch data
         firebaseManager.CheckServerConnection((isConnected) =>
         {
             if (isConnected)
             {
                 Debug.Log("MainMenuManager: Server connection successful, fetching most recent reaction time");
 
-                // Get the most recent reaction time
                 firebaseManager.GetMostRecentReactionTime((reactionTime) =>
                 {
                     if (reactionTime > 0)
                     {
                         Debug.Log($"MainMenuManager: Got reaction time from server: {reactionTime}ms");
 
-                        // Refresh the UI with the updated data
                         SetupPlayerStats();
                         SetupChallengeSection();
                     }
@@ -196,10 +180,8 @@ public class MainMenuManager : MonoBehaviour
 
     void SetupPlayerStats()
     {
-        // Check if we have saved reaction time data
         if (ReactionTimeManager.HasReactionTimeData())
         {
-            // Use the most recent average reaction time
             float lastAvgTime = ReactionTimeManager.GetLastAverageReactionTime();
             int roundedAvgTime = Mathf.RoundToInt(lastAvgTime);
 
@@ -211,7 +193,6 @@ public class MainMenuManager : MonoBehaviour
         }
         else
         {
-            // No reaction time data yet
             if (reactionTimeText != null)
                 reactionTimeText.text = "No reaction time yet";
 
@@ -222,21 +203,17 @@ public class MainMenuManager : MonoBehaviour
 
     void SetupButtons()
     {
-        // Game mode buttons
         if (soloButton != null)
         {
             soloButton.onClick.AddListener(() => LoadGameMode("Solo"));
-            // Make sure the solo button is active and properly configured
             soloButton.gameObject.SetActive(true);
         }
 
         if (multiplayerButton != null)
         {
             multiplayerButton.onClick.AddListener(() => LoadGameMode("Multiplayer"));
-            // Double ensure the button is active
             multiplayerButton.gameObject.SetActive(true);
 
-            // Add component if missing
             ModeButtonController controller = multiplayerButton.GetComponent<ModeButtonController>();
             if (controller != null)
             {
@@ -244,7 +221,6 @@ public class MainMenuManager : MonoBehaviour
             }
         }
 
-        // Navigation buttons
         if (homeButton != null)
             homeButton.onClick.AddListener(() => SwitchTab("Home"));
 
@@ -260,14 +236,12 @@ public class MainMenuManager : MonoBehaviour
 
     void SetupProfilePanel()
     {
-        // Get the ProfilePanelController component
         if (profilePanel != null)
         {
             profilePanelController = profilePanel.GetComponent<ProfilePanelController>();
 
             if (profilePanelController != null)
             {
-                // Initialize the profile panel with the user's email
                 if (!string.IsNullOrEmpty(playerEmail))
                 {
                     Debug.Log($"Initializing ProfilePanelController with email: {playerEmail}");
@@ -276,7 +250,6 @@ public class MainMenuManager : MonoBehaviour
                 else
                 {
                     Debug.LogError("Player email is empty or null! Attempting to use PlayerPrefs.");
-                    // Try to get email from PlayerPrefs as fallback
                     if (PlayerPrefs.HasKey("UserEmail"))
                     {
                         playerEmail = PlayerPrefs.GetString("UserEmail");
@@ -293,7 +266,6 @@ public class MainMenuManager : MonoBehaviour
             {
                 Debug.LogError("ProfilePanelController component not found on the profile panel");
 
-                // Try to add the component if it doesn't exist
                 profilePanelController = profilePanel.AddComponent<ProfilePanelController>();
                 if (profilePanelController != null)
                 {
@@ -307,15 +279,9 @@ public class MainMenuManager : MonoBehaviour
             Debug.LogError("Profile panel reference is missing!");
         }
 
-        // Leave the rest of this function intact below
-        // This UI code can remain, even though the profile functionality
-        // is now handled by the ProfilePanelController
-
-        // Set email text
         if (emailText != null)
             emailText.text = playerEmail;
 
-        // Setup profession dropdown
         if (professionDropdown != null)
         {
             professionDropdown.ClearOptions();
@@ -328,29 +294,21 @@ public class MainMenuManager : MonoBehaviour
 
             professionDropdown.AddOptions(options);
 
-            // Set current value
             int currentIndex = System.Array.IndexOf(professions, playerProfession);
             if (currentIndex >= 0)
                 professionDropdown.value = currentIndex;
         }
-
-        // We no longer need this as the ProfilePanelController handles the save functionality
-        // if (saveProfileButton != null)
-        //    saveProfileButton.onClick.AddListener(SaveProfileChanges);
     }
 
     void StartChallenge()
     {
         Debug.Log("Starting today's challenge");
-        // Load the game scene or start the challenge
-        // SceneManager.LoadScene("GameScene");
     }
 
     public void LoadGameMode(string mode)
     {
         Debug.Log("Loading game mode: " + mode);
 
-        // Load the appropriate game mode scene
         if (mode == "Solo")
         {
             try
@@ -381,10 +339,8 @@ public class MainMenuManager : MonoBehaviour
 
     public void SwitchTab(string tab)
     {
-        // Update current tab
         currentTab = tab;
 
-        // Update UI elements based on the selected tab
         switch (tab)
         {
             case "Home":
@@ -412,7 +368,6 @@ public class MainMenuManager : MonoBehaviour
                 {
                     profilePanel.SetActive(true);
 
-                    // Reinitialize the profile panel when switching to it
                     if (profilePanelController != null)
                     {
                         profilePanelController.Initialize(playerEmail);
@@ -421,17 +376,14 @@ public class MainMenuManager : MonoBehaviour
                 break;
         }
 
-        // Update navigation button appearance
         UpdateNavButtonAppearance();
     }
 
     void UpdateNavButtonAppearance()
     {
-        // Helper function to update button appearance based on active tab
-        Color activeColor = new Color(0f, 0.8f, 1f); // BlinkTap cyan
+        Color activeColor = new Color(0f, 0.8f, 1f);
         Color inactiveColor = new Color(0.7f, 0.7f, 0.7f);
 
-        // Update home button
         if (homeButton != null)
         {
             TextMeshProUGUI buttonText = homeButton.GetComponentInChildren<TextMeshProUGUI>();
@@ -442,7 +394,6 @@ public class MainMenuManager : MonoBehaviour
             }
         }
 
-        // Update solo button
         if (soloNavButton != null)
         {
             TextMeshProUGUI buttonText = soloNavButton.GetComponentInChildren<TextMeshProUGUI>();
@@ -453,7 +404,6 @@ public class MainMenuManager : MonoBehaviour
             }
         }
 
-        // Update multiplayer button
         if (multiplayerNavButton != null)
         {
             TextMeshProUGUI buttonText = multiplayerNavButton.GetComponentInChildren<TextMeshProUGUI>();
@@ -464,7 +414,6 @@ public class MainMenuManager : MonoBehaviour
             }
         }
 
-        // Update profile button
         if (profileButton != null)
         {
             TextMeshProUGUI buttonText = profileButton.GetComponentInChildren<TextMeshProUGUI>();
@@ -476,25 +425,12 @@ public class MainMenuManager : MonoBehaviour
         }
     }
 
-    // This method is no longer needed as the ProfilePanelController handles this functionality
-    void SaveProfileChanges()
-    {
-        // This functionality is now handled by the ProfilePanelController
-        // Method kept for backward compatibility
-        Debug.Log("SaveProfileChanges in MainMenuManager is deprecated. Using ProfilePanelController instead.");
-    }
-
-    // Update player stats in real-time
     public void UpdateStats(int newReactionTime)
     {
-        // No need to update personalBest variable as we now use PlayerPrefs
-
-        // Update UI elements
         SetupPlayerStats();
         SetupChallengeSection();
     }
 
-    // Public method to set the multiplayer button reference
     public void SetMultiplayerButton(Button button)
     {
         if (button != null)
@@ -505,7 +441,6 @@ public class MainMenuManager : MonoBehaviour
         }
     }
 
-    // Public method to set the solo button reference
     public void SetSoloButton(Button button)
     {
         if (button != null)
@@ -517,12 +452,10 @@ public class MainMenuManager : MonoBehaviour
         }
     }
 
-    // Public method to force fetch data from Firebase (useful for debugging)
     public void ForceFetchFromFirebase()
     {
         Debug.Log("MainMenuManager: ForceFetchFromFirebase called - manually attempting to fetch data");
 
-        // Get FirebaseManager instance
         FirebaseManager firebaseManager = FindObjectOfType<FirebaseManager>();
         if (firebaseManager == null)
         {
@@ -530,7 +463,6 @@ public class MainMenuManager : MonoBehaviour
             return;
         }
 
-        // Check connection
         Debug.Log($"MainMenuManager: Using backend URL: {firebaseManager.GetBackendUrl()}");
         firebaseManager.CheckServerConnection((isConnected) =>
         {
@@ -538,7 +470,6 @@ public class MainMenuManager : MonoBehaviour
             {
                 Debug.Log("MainMenuManager: Connection OK, getting reaction time");
 
-                // Get user email from PlayerPrefs
                 string email = "unknown";
                 if (PlayerPrefs.HasKey("UserEmail"))
                 {
@@ -547,13 +478,11 @@ public class MainMenuManager : MonoBehaviour
 
                 Debug.Log($"MainMenuManager: Using email: {email}");
 
-                // Get most recent reaction time
                 firebaseManager.GetMostRecentReactionTime((reactionTime) =>
                 {
                     Debug.Log($"MainMenuManager: Got reaction time: {reactionTime}ms");
                     if (reactionTime > 0)
                     {
-                        // Find any StatsPanelController in the scene and update it directly for testing
                         StatsPanelController[] controllers = FindObjectsOfType<StatsPanelController>();
                         Debug.Log($"MainMenuManager: Found {controllers.Length} StatsPanelController instances");
 

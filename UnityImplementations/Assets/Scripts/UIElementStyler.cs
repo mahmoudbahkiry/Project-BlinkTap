@@ -4,10 +4,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-/// <summary>
-/// UIElementStyler handles the styling of UI elements 
-/// such as buttons, panels and other custom UI components
-/// </summary>
 public class UIElementStyler : MonoBehaviour
 {
     [Header("Mode Button Styling")]
@@ -21,29 +17,23 @@ public class UIElementStyler : MonoBehaviour
     [Header("Text Colors")]
     [SerializeField] private Color primaryTextColor = Color.white;
     [SerializeField] private Color secondaryTextColor = new Color(0.7f, 0.7f, 0.7f);
-    [SerializeField] private Color accentTextColor = new Color(0f, 0.8f, 1f); // BlinkTap cyan color
+    [SerializeField] private Color accentTextColor = new Color(0f, 0.8f, 1f);
 
     [Header("Accent Color for Stats")]
     [SerializeField] private Color positiveChangeColor = new Color(0.2f, 0.8f, 0.4f);
     [SerializeField] private Color negativeChangeColor = new Color(0.8f, 0.2f, 0.2f);
 
-    /// <summary>
-    /// Apply mode button style to a button with an icon and label
-    /// </summary>
     public void StyleModeButton(Button button, Image iconImage, TextMeshProUGUI titleText,
                                TextMeshProUGUI descriptionText, ModeType mode)
     {
         if (button == null || iconImage == null) return;
 
-        // Get background image component
         Image backgroundImage = button.GetComponent<Image>();
         if (backgroundImage == null) return;
 
-        // Set background color based on mode type
         Color backgroundColor = GetModeColor(mode);
         backgroundImage.color = backgroundColor;
 
-        // Style texts
         if (titleText != null)
         {
             titleText.color = primaryTextColor;
@@ -58,9 +48,6 @@ public class UIElementStyler : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Get color for specific mode
-    /// </summary>
     public Color GetModeColor(ModeType mode)
     {
         switch (mode)
@@ -74,19 +61,14 @@ public class UIElementStyler : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Style challenge panel
-    /// </summary>
     public void StyleChallengePanel(Image backgroundPanel, TextMeshProUGUI titleText,
                                    TextMeshProUGUI bestScoreText, TextMeshProUGUI playersCompletedText,
                                    Button startButton)
     {
         if (backgroundPanel == null) return;
 
-        // Style the panel
-        backgroundPanel.color = soloModeColor; // Using the solo mode color for challenge panel
+        backgroundPanel.color = soloModeColor;
 
-        // Style texts
         if (titleText != null)
         {
             titleText.color = primaryTextColor;
@@ -106,7 +88,6 @@ public class UIElementStyler : MonoBehaviour
             playersCompletedText.fontSize = 18;
         }
 
-        // Style start button
         if (startButton != null)
         {
             Image buttonImage = startButton.GetComponent<Image>();
@@ -125,19 +106,14 @@ public class UIElementStyler : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Style stats panel for reaction time
-    /// </summary>
     public void StyleStatsPanel(Image backgroundPanel, TextMeshProUGUI titleText,
                                TextMeshProUGUI valueText, TextMeshProUGUI changeText,
                                bool isPositiveChange = true)
     {
         if (backgroundPanel == null) return;
 
-        // Style the panel
         backgroundPanel.color = headerPanelColor;
 
-        // Style texts
         if (titleText != null)
         {
             titleText.color = secondaryTextColor;
@@ -159,9 +135,6 @@ public class UIElementStyler : MonoBehaviour
     }
 }
 
-/// <summary>
-/// Mode types for styling
-/// </summary>
 public enum ModeType
 {
     Solo,

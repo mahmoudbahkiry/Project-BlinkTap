@@ -23,15 +23,11 @@ public class CircleBehavior : MonoBehaviour, IPointerClickHandler
         Destroy(gameObject, lifetime);
 
         circleImage = GetComponent<Image>();
-
-        // Find the test manager once at start
         testManager = FindObjectOfType<TestTimerManager>();
         if (testManager == null)
         {
             Debug.LogWarning("CircleBehavior: TestTimerManager not found in scene!");
         }
-
-        // Try to set the tag, but don't crash if it doesn't exist
         try
         {
             gameObject.tag = "Circle";
@@ -77,29 +73,21 @@ public class CircleBehavior : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        // First check if we're already destroyed
         if (destroyed)
         {
             return;
         }
-
-        // Check if test is active - ignore clicks if not in progress
-        // Use cached reference to test manager or try to find it if null
         if (testManager == null)
         {
             testManager = FindObjectOfType<TestTimerManager>();
         }
 
         bool testActive = testManager != null && testManager.IsTestActive();
-
-        // If test is not active, ignore click
         if (!testActive)
         {
             Debug.Log("CircleBehavior: Click ignored - test not active");
             return;
         }
-
-        // Process the tap
         currentTaps++;
         Debug.Log($"CircleBehavior: Circle tapped! Current taps: {currentTaps}/{requiredTaps}");
 

@@ -15,14 +15,12 @@ public class StatsPanelController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI valueText;
     [SerializeField] private TextMeshProUGUI changeText;
 
-    // References
     private UIElementStyler styler;
 
     private void Awake()
     {
         Debug.Log($"StatsPanelController: Awake called on {gameObject.name}");
 
-        // Try to find references if not assigned
         if (backgroundPanel == null)
         {
             backgroundPanel = GetComponent<Image>();
@@ -42,7 +40,6 @@ public class StatsPanelController : MonoBehaviour
             valueText = valueTransform?.GetComponent<TextMeshProUGUI>();
             Debug.Log($"StatsPanelController: Found ValueText transform: {(valueTransform != null ? "Yes" : "No")}, with TextMeshProUGUI: {(valueText != null ? "Yes" : "No")}");
 
-            // If still null, try searching for "Value" instead
             if (valueText == null)
             {
                 Transform alternateValueTransform = transform.Find("Value");
@@ -50,14 +47,11 @@ public class StatsPanelController : MonoBehaviour
                 Debug.Log($"StatsPanelController: Found alternate Value transform: {(alternateValueTransform != null ? "Yes" : "No")}, with TextMeshProUGUI: {(valueText != null ? "Yes" : "No")}");
             }
 
-            // Last resort - look for any TextMeshProUGUI components that might be the value text
             if (valueText == null)
             {
-                // Log the full hierarchy for debugging
                 Debug.Log("StatsPanelController: Dumping full GameObject hierarchy:");
                 PrintHierarchy(transform, 0);
 
-                // Try to find any TextMeshProUGUI that might be our value
                 TextMeshProUGUI[] allTexts = GetComponentsInChildren<TextMeshProUGUI>();
                 Debug.Log($"StatsPanelController: Found {allTexts.Length} TextMeshProUGUI components in children");
                 for (int i = 0; i < allTexts.Length; i++)
@@ -75,7 +69,6 @@ public class StatsPanelController : MonoBehaviour
         }
     }
 
-    // Helper method to print the full hierarchy for debugging
     private void PrintHierarchy(Transform t, int depth)
     {
         string indent = new string(' ', depth * 2);
@@ -100,23 +93,19 @@ public class StatsPanelController : MonoBehaviour
 
     void Start()
     {
-        // Find references in scene
         if (styler == null)
             styler = FindObjectOfType<UIElementStyler>();
 
-        // Apply initial settings
         SetupStatPanel();
     }
 
     public void SetupStatPanel()
     {
-        // Set title based on stats type
         if (titleText != null)
         {
             titleText.text = GetStatTitle();
         }
 
-        // Apply styling
         if (styler != null)
         {
             styler.StyleStatsPanel(
@@ -128,7 +117,6 @@ public class StatsPanelController : MonoBehaviour
         }
     }
 
-    // Update stats value
     public void UpdateValue(string value, string change)
     {
         Debug.Log($"StatsPanelController: UpdateValue called with value={value}, change={change}");
@@ -149,7 +137,6 @@ public class StatsPanelController : MonoBehaviour
             changeText.text = change;
             Debug.Log($"StatsPanelController: changeText updated to '{change}'");
 
-            // Update color based on change direction
             if (styler != null)
             {
                 styler.StyleStatsPanel(
@@ -171,7 +158,6 @@ public class StatsPanelController : MonoBehaviour
         }
     }
 
-    // Helper method to get stat title
     private string GetStatTitle()
     {
         switch (statsType)
@@ -189,7 +175,6 @@ public class StatsPanelController : MonoBehaviour
         }
     }
 
-    // Helper method to determine if change is positive
     private bool IsPositiveChange()
     {
         if (changeText == null)
@@ -199,13 +184,11 @@ public class StatsPanelController : MonoBehaviour
         return text.StartsWith("+") || text.StartsWith("↑");
     }
 
-    // Make valueText accessible for direct updates
     public TextMeshProUGUI ValueTextComponent
     {
         get { return valueText; }
     }
 
-    // Method to directly update the value text for debugging
     public void UpdateValueTextDirectly(string text)
     {
         Debug.Log($"StatsPanelController: Direct update of ValueText to '{text}'");
@@ -219,7 +202,6 @@ public class StatsPanelController : MonoBehaviour
         {
             Debug.LogError("StatsPanelController: Cannot update ValueText (null reference)");
 
-            // Try to find it again as a last resort
             if (FindAndAssignValueText())
             {
                 valueText.text = text;
@@ -228,10 +210,8 @@ public class StatsPanelController : MonoBehaviour
         }
     }
 
-    // Helper method to find and assign the valueText component
     private bool FindAndAssignValueText()
     {
-        // Try different possible names
         string[] possibleNames = new string[] { "ValueText", "Value" };
 
         foreach (string name in possibleNames)
@@ -248,7 +228,6 @@ public class StatsPanelController : MonoBehaviour
             }
         }
 
-        // Last resort - find first TextMeshProUGUI that isn't title or change
         TextMeshProUGUI[] allTexts = GetComponentsInChildren<TextMeshProUGUI>();
         foreach (TextMeshProUGUI text in allTexts)
         {
@@ -265,9 +244,6 @@ public class StatsPanelController : MonoBehaviour
     }
 }
 
-/// <summary>
-/// Types of stats panels
-/// </summary>
 public enum StatsType
 {
     ReactionTime,

@@ -23,7 +23,6 @@ public class MultiplayerTimerManager : MonoBehaviour
     private bool testInProgress = false;
     private float testTimer;
 
-    // Public method to check if test is currently active
     public bool IsTestActive()
     {
         return testInProgress;
@@ -31,7 +30,6 @@ public class MultiplayerTimerManager : MonoBehaviour
 
     private void Awake()
     {
-        // Validate references
         if (timerText == null)
         {
             Debug.LogError("Timer Text not assigned in Inspector!");
@@ -59,20 +57,16 @@ public class MultiplayerTimerManager : MonoBehaviour
 
     private void Start()
     {
-        // Initialize timer text
         if (timerText != null)
         {
             timerText.text = $"Time: {testDuration:00.0}";
         }
 
-        // Ensure circle spawners don't spawn yet
         StopCircleSpawners();
 
-        // Don't automatically start
         testInProgress = false;
     }
 
-    // Called by MultiplayerManager after the countdown
     public void StartTest()
     {
         Debug.Log("MultiplayerTimerManager: StartTest called - Starting the test now");
@@ -80,7 +74,6 @@ public class MultiplayerTimerManager : MonoBehaviour
         testInProgress = true;
         testTimer = testDuration;
 
-        // Start circle spawners
         StartCircleSpawners();
     }
 
@@ -88,16 +81,13 @@ public class MultiplayerTimerManager : MonoBehaviour
     {
         if (testInProgress)
         {
-            // Update timer
             testTimer -= Time.deltaTime;
 
-            // Update timer display
             if (timerText != null)
             {
                 timerText.text = $"Time: {testTimer:00.0}";
             }
 
-            // Check if test is over
             if (testTimer <= 0)
             {
                 Debug.Log("MultiplayerTimerManager: Timer reached zero - ending test");
@@ -111,19 +101,15 @@ public class MultiplayerTimerManager : MonoBehaviour
         Debug.Log("MultiplayerTimerManager: EndTest called - Test is now over");
         testInProgress = false;
 
-        // Update timer display to show 0
         if (timerText != null)
         {
             timerText.text = "Time: 00.0";
         }
 
-        // Stop circle spawners
         StopCircleSpawners();
 
-        // Destroy any remaining circles
         DestroyRemainingCircles();
 
-        // Notify the multiplayer manager that the test has ended
         if (multiplayerManager != null)
         {
             multiplayerManager.OnTestCompleted();
@@ -166,7 +152,6 @@ public class MultiplayerTimerManager : MonoBehaviour
     {
         try
         {
-            // Only destroy circles if the tag exists
             GameObject[] remainingCircles = GameObject.FindGameObjectsWithTag("Circle");
             foreach (GameObject circle in remainingCircles)
             {

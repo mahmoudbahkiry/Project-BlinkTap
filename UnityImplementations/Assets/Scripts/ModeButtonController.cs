@@ -18,13 +18,11 @@ public class ModeButtonController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI descriptionText;
     [SerializeField] private Button modeButton;
 
-    // References
     private UIElementStyler styler;
     private MainMenuManager menuManager;
 
     private void Awake()
     {
-        // Try to find references if not assigned
         if (modeButton == null)
             modeButton = GetComponent<Button>();
 
@@ -40,23 +38,19 @@ public class ModeButtonController : MonoBehaviour
 
     void Start()
     {
-        // Find references in scene
         if (styler == null)
             styler = FindObjectOfType<UIElementStyler>();
 
         if (menuManager == null)
             menuManager = FindObjectOfType<MainMenuManager>();
 
-        // Auto-detect multiplayer button based on name
         string objName = gameObject.name.ToLower();
         if (objName.Contains("multiplayer"))
         {
-            // Automatically configure for multiplayer mode
             modeType = ModeType.Multiplayer;
             modeName = "Multiplayer";
             modeDescription = "Compete with others";
 
-            // Register with menu manager
             if (menuManager != null)
             {
                 menuManager.multiplayerButton = GetComponent<Button>();
@@ -64,22 +58,18 @@ public class ModeButtonController : MonoBehaviour
         }
         else if (objName.Contains("solo"))
         {
-            // Ensure solo mode is set correctly
             modeType = ModeType.Solo;
             modeName = "Solo";
             modeDescription = "Train your reflexes";
 
-            // Register with menu manager
             if (menuManager != null)
             {
                 menuManager.SetSoloButton(GetComponent<Button>());
             }
         }
 
-        // Apply mode configuration
         ApplyModeSettings();
 
-        // Setup button click event
         if (modeButton != null)
         {
             modeButton.onClick.AddListener(OnModeButtonClicked);
@@ -88,13 +78,11 @@ public class ModeButtonController : MonoBehaviour
 
     public void ApplyModeSettings()
     {
-        // Set icon
         if (iconImage != null && modeIcon != null)
         {
             iconImage.sprite = modeIcon;
         }
 
-        // Set text
         if (titleText != null)
         {
             titleText.text = modeName;
@@ -105,7 +93,6 @@ public class ModeButtonController : MonoBehaviour
             descriptionText.text = modeDescription;
         }
 
-        // Apply styling
         if (styler != null)
         {
             styler.StyleModeButton(modeButton, iconImage, titleText, descriptionText, modeType);
@@ -114,18 +101,14 @@ public class ModeButtonController : MonoBehaviour
 
     private void OnModeButtonClicked()
     {
-        // Forward event to menu manager
         if (menuManager != null)
         {
-            // Call the LoadGameMode method on the MainMenuManager
             Debug.Log("Mode button clicked: " + modeName);
 
-            // Call the appropriate method on the menu manager with the correct mode
             menuManager.LoadGameMode(modeName);
         }
     }
 
-    // Method to configure button externally
     public void Configure(ModeType type, string name, string description, Sprite icon)
     {
         modeType = type;
@@ -133,7 +116,6 @@ public class ModeButtonController : MonoBehaviour
         modeDescription = description;
         modeIcon = icon;
 
-        // If the object is active, apply the settings immediately
         if (gameObject.activeSelf)
         {
             ApplyModeSettings();

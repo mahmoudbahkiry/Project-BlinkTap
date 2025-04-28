@@ -53,16 +53,13 @@ public class LoginManager : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            // You can store the token here if you return it
             Debug.Log("Login success: " + request.downloadHandler.text);
 
-            // Store the user's email in PlayerPrefs for future use
             PlayerPrefs.SetString("UserEmail", email);
             PlayerPrefs.Save();
 
             loginPanel.SetActive(false);
 
-            // Load the main menu scene
             SceneManager.LoadScene(mainMenuSceneName);
         }
         else

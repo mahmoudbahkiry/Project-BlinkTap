@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 public class MultiplayerCircleBehavior : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField] private float lifetime = 3f;
-    [SerializeField] private int playerOwner = 1; // 1 for Player 1, 2 for Player 2
+    [SerializeField] private int playerOwner = 1;
 
     private float spawnTime;
     private bool destroyed = false;
@@ -16,7 +16,6 @@ public class MultiplayerCircleBehavior : MonoBehaviour, IPointerClickHandler
     private MultiplayerManager multiplayerManager;
     private bool tagSet = false;
 
-    // Property to set/get player owner
     public int PlayerOwner
     {
         get { return playerOwner; }
@@ -31,7 +30,6 @@ public class MultiplayerCircleBehavior : MonoBehaviour, IPointerClickHandler
 
         circleImage = GetComponent<Image>();
 
-        // Find the managers
         timerManager = FindObjectOfType<MultiplayerTimerManager>();
         if (timerManager == null)
         {
@@ -44,7 +42,6 @@ public class MultiplayerCircleBehavior : MonoBehaviour, IPointerClickHandler
             Debug.LogWarning("MultiplayerCircleBehavior: MultiplayerManager not found in scene!");
         }
 
-        // Try to set the tag, but don't crash if it doesn't exist
         try
         {
             gameObject.tag = "Circle";
@@ -90,13 +87,11 @@ public class MultiplayerCircleBehavior : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        // First check if we're already destroyed
         if (destroyed)
         {
             return;
         }
 
-        // Check if test is active - ignore clicks if not in progress
         if (timerManager == null)
         {
             timerManager = FindObjectOfType<MultiplayerTimerManager>();
@@ -104,14 +99,12 @@ public class MultiplayerCircleBehavior : MonoBehaviour, IPointerClickHandler
 
         bool testActive = timerManager != null && timerManager.IsTestActive();
 
-        // If test is not active, ignore click
         if (!testActive)
         {
             Debug.Log("MultiplayerCircleBehavior: Click ignored - test not active");
             return;
         }
 
-        // Process the tap
         currentTaps++;
         Debug.Log($"MultiplayerCircleBehavior: Circle tapped for Player {playerOwner}! Current taps: {currentTaps}/{requiredTaps}");
 
@@ -124,16 +117,13 @@ public class MultiplayerCircleBehavior : MonoBehaviour, IPointerClickHandler
 
             Debug.Log($"MultiplayerCircleBehavior: Circle completed for Player {playerOwner} with {requiredTaps} taps! Reaction time: {reactionTimeInMS} ms");
 
-            // Get the MultiplayerManager if not yet found
             if (multiplayerManager == null)
             {
                 multiplayerManager = MultiplayerManager.Instance;
             }
 
-            // Track reaction time in the MultiplayerManager
             if (multiplayerManager != null)
             {
-                // Store the reaction time based on player owner
                 if (playerOwner == 1)
                 {
                     multiplayerManager.AddPlayer1ReactionTime(reactionTimeInMS);

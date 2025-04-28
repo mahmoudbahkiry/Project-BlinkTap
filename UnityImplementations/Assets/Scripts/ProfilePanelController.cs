@@ -7,9 +7,6 @@ using UnityEngine.Networking;
 using System.Text;
 using System;
 
-/// <summary>
-/// Controls the ProfilePanel UI and functionality
-/// </summary>
 public class ProfilePanelController : MonoBehaviour
 {
     [Header("UI Components")]
@@ -24,7 +21,7 @@ public class ProfilePanelController : MonoBehaviour
     [Header("Backend Configuration")]
     [SerializeField] private string backendUrl = "http://localhost:3000";
     [SerializeField] private bool logDetailedNetworkInfo = true;
-    [SerializeField] private bool useHttpServiceForTesting = false; // Set to true for local testing
+    [SerializeField] private bool useHttpServiceForTesting = false;
 
     private MainMenuManager menuManager;
     private string userEmail;
@@ -32,7 +29,6 @@ public class ProfilePanelController : MonoBehaviour
 
     private void Awake()
     {
-        // Try to find references if not assigned
         if (titleText == null)
             titleText = transform.Find("TitleText")?.GetComponent<TextMeshProUGUI>();
 
@@ -42,19 +38,14 @@ public class ProfilePanelController : MonoBehaviour
         if (professionDropdown == null)
             professionDropdown = transform.Find("Content/ProfessionDropdown")?.GetComponent<TMP_Dropdown>();
 
-        // Try harder to find the save button if it's not assigned
         if (saveButton == null)
         {
-            // First try the direct path
             saveButton = transform.Find("Buttons/SaveButton")?.GetComponent<Button>();
 
-            // If that fails, try searching by name
             if (saveButton == null)
             {
-                // Search in immediate children
                 saveButton = GetComponentInChildren<Button>();
 
-                // If still not found, try to find any button with "save" in its name
                 if (saveButton == null)
                 {
                     Button[] allButtons = GetComponentsInChildren<Button>(true);
@@ -71,7 +62,6 @@ public class ProfilePanelController : MonoBehaviour
             }
         }
 
-        // If we found a save button, log it
         if (saveButton != null)
         {
             Debug.Log($"Found save button: {saveButton.name}");
@@ -84,7 +74,6 @@ public class ProfilePanelController : MonoBehaviour
         if (backgroundPanel == null)
             backgroundPanel = GetComponent<Image>();
 
-        // Create feedback panel if it doesn't exist
         if (feedbackPanel == null)
         {
             GameObject panel = new GameObject("FeedbackPanel");
@@ -119,27 +108,19 @@ public class ProfilePanelController : MonoBehaviour
 
     void Start()
     {
-        // Find references
         menuManager = FindObjectOfType<MainMenuManager>();
 
-        // Style the panel
         ApplyStyle();
 
-        // Make sure the save button is set up correctly
         SetupSaveButton();
     }
 
-    /// <summary>
-    /// Set up the save button with the correct click listener
-    /// </summary>
     private void SetupSaveButton()
     {
-        // Try to find the save button again if we still don't have it
         if (saveButton == null)
         {
             Debug.LogWarning("Save button not assigned! Attempting to find it...");
 
-            // Search for any button with "save" in the name
             Button[] allButtons = GetComponentsInChildren<Button>(true);
             foreach (Button button in allButtons)
             {
@@ -151,14 +132,12 @@ public class ProfilePanelController : MonoBehaviour
                 }
             }
 
-            // Last resort - just use the first button we find
             if (saveButton == null && allButtons.Length > 0)
             {
                 saveButton = allButtons[0];
                 Debug.LogWarning($"Using first available button as save button: {saveButton.name}");
             }
 
-            // If still no button, create one
             if (saveButton == null)
             {
                 saveButton = CreateSaveButton();
@@ -167,10 +146,8 @@ public class ProfilePanelController : MonoBehaviour
 
         if (saveButton != null)
         {
-            // Clear any existing listeners to prevent duplicates
             saveButton.onClick.RemoveAllListeners();
 
-            // Add our save function
             saveButton.onClick.AddListener(SaveProfileData);
 
             Debug.Log("Save button listener set up successfully");
@@ -182,14 +159,10 @@ public class ProfilePanelController : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Creates a save button if one doesn't exist
-    /// </summary>
     private Button CreateSaveButton()
     {
         Debug.Log("Creating a save button...");
 
-        // Create a parent container for the button if needed
         Transform buttonsContainer = transform.Find("Buttons");
         if (buttonsContainer == null)
         {
@@ -204,11 +177,9 @@ public class ProfilePanelController : MonoBehaviour
             rect.sizeDelta = new Vector2(200, 50);
         }
 
-        // Create the button
         GameObject buttonObj = new GameObject("SaveButton");
         buttonObj.transform.SetParent(buttonsContainer);
 
-        // Set up the RectTransform
         RectTransform buttonRect = buttonObj.AddComponent<RectTransform>();
         buttonRect.anchorMin = new Vector2(0.5f, 0.5f);
         buttonRect.anchorMax = new Vector2(0.5f, 0.5f);
@@ -216,25 +187,20 @@ public class ProfilePanelController : MonoBehaviour
         buttonRect.anchoredPosition = Vector2.zero;
         buttonRect.sizeDelta = new Vector2(160, 40);
 
-        // Add Image component (button background)
         Image buttonImage = buttonObj.AddComponent<Image>();
-        buttonImage.color = new Color(0f, 0.8f, 1f); // BlinkTap cyan
+        buttonImage.color = new Color(0f, 0.8f, 1f);
 
-        // Add Button component
         Button button = buttonObj.AddComponent<Button>();
 
-        // Create text child
         GameObject textObj = new GameObject("Text");
         textObj.transform.SetParent(buttonObj.transform);
 
-        // Set up text RectTransform
         RectTransform textRect = textObj.AddComponent<RectTransform>();
         textRect.anchorMin = Vector2.zero;
         textRect.anchorMax = Vector2.one;
         textRect.offsetMin = Vector2.zero;
         textRect.offsetMax = Vector2.zero;
 
-        // Add TextMeshProUGUI component
         TextMeshProUGUI buttonText = textObj.AddComponent<TextMeshProUGUI>();
         buttonText.text = "SAVE";
         buttonText.fontSize = 18;
@@ -246,10 +212,6 @@ public class ProfilePanelController : MonoBehaviour
         return button;
     }
 
-    /// <summary>
-    /// Initialize the profile panel with user data
-    /// </summary>
-    /// <param name="email">The user's email</param>
     public void Initialize(string email)
     {
         Debug.Log($"Initializing ProfilePanel with email: {email}");
@@ -258,16 +220,11 @@ public class ProfilePanelController : MonoBehaviour
         if (emailText != null)
             emailText.text = email;
 
-        // Load any existing profile data
         StartCoroutine(LoadProfileData());
 
-        // Make sure the save button is set up correctly when initializing
         SetupSaveButton();
     }
 
-    /// <summary>
-    /// Load the user's profile data from the backend
-    /// </summary>
     private IEnumerator LoadProfileData()
     {
         if (string.IsNullOrEmpty(userEmail))
@@ -296,7 +253,6 @@ public class ProfilePanelController : MonoBehaviour
                     {
                         Debug.Log($"Setting profession dropdown to: {profileData.profession}");
 
-                        // Find and set the dropdown value based on profession
                         for (int i = 0; i < professionDropdown.options.Count; i++)
                         {
                             if (professionDropdown.options[i].text == profileData.profession)
@@ -324,9 +280,6 @@ public class ProfilePanelController : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Save the user's profile data to the backend
-    /// </summary>
     public void SaveProfileData()
     {
         Debug.Log("SaveProfileData method called");
@@ -361,31 +314,22 @@ public class ProfilePanelController : MonoBehaviour
         string selectedProfession = professionDropdown.options[professionDropdown.value].text;
         Debug.Log($"Saving profession: {selectedProfession} for user: {userEmail}");
 
-        // If we're using direct Firestore for testing, save directly
         if (useHttpServiceForTesting)
         {
             StartCoroutine(DirectFirestoreSave(selectedProfession));
             return;
         }
 
-        // First verify we can connect to the server
         StartCoroutine(TestConnection(() =>
         {
-            // Connection successful, proceed with saving profile data
             StartCoroutine(SendProfileDataToServer(userEmail, selectedProfession));
         }));
     }
 
-    /// <summary>
-    /// Send the profile data to the backend server
-    /// </summary>
-    /// <param name="email">The user's email</param>
-    /// <param name="profession">The selected profession</param>
     private IEnumerator SendProfileDataToServer(string email, string profession)
     {
         Debug.Log("SendProfileDataToServer method started");
 
-        // Disable save button while sending to prevent multiple clicks
         if (saveButton != null)
         {
             saveButton.interactable = false;
@@ -396,12 +340,10 @@ public class ProfilePanelController : MonoBehaviour
             }
         }
 
-        // Use the correct endpoint path - the server logs show it's expecting just /profile, not /api/v1/user/profile
         string url = $"{backendUrl}/profile";
 
         Debug.Log($"Using endpoint: {url}");
 
-        // Create the JSON data
         ProfileData profileData = new ProfileData
         {
             email = email,
@@ -413,7 +355,6 @@ public class ProfilePanelController : MonoBehaviour
 
         yield return StartCoroutine(SendWebRequest(url, jsonData, (success, response) =>
         {
-            // Re-enable save button
             if (saveButton != null)
             {
                 saveButton.interactable = true;
@@ -428,7 +369,6 @@ public class ProfilePanelController : MonoBehaviour
             {
                 Debug.Log($"Profile saved successfully. Server response: {response}");
 
-                // Parse the response and log more details if possible
                 try
                 {
                     ServerResponse serverResponse = JsonUtility.FromJson<ServerResponse>(response);
@@ -453,7 +393,6 @@ public class ProfilePanelController : MonoBehaviour
             {
                 Debug.LogError($"Failed to save profile. Error: {response}");
 
-                // Check if the error contains HTML with "Cannot POST" message
                 if (response.Contains("Cannot POST"))
                 {
                     Debug.LogWarning("API endpoint issue detected. Falling back to test mode.");
@@ -467,19 +406,13 @@ public class ProfilePanelController : MonoBehaviour
         }));
     }
 
-    /// <summary>
-    /// Direct save to Firestore for testing (requires running a server-side script)
-    /// </summary>
     private IEnumerator DirectFirestoreSave(string profession)
     {
         Debug.Log("Using direct Firestore save method for testing");
         ShowFeedback("Server endpoint error - using fallback save method", Color.yellow);
 
-        // This is just a simulation - in a real implementation,
-        // you would need to configure and use the Firebase SDK for Unity
         yield return new WaitForSeconds(1.0f);
 
-        // Save locally
         PlayerPrefs.SetString($"Profile_{userEmail}", profession);
         PlayerPrefs.Save();
 
@@ -487,9 +420,6 @@ public class ProfilePanelController : MonoBehaviour
         ShowFeedback("Profile data saved locally (Test Mode)", Color.green);
     }
 
-    /// <summary>
-    /// Test connection to the backend server
-    /// </summary>
     private IEnumerator TestConnection(System.Action onSuccess = null)
     {
         string url = $"{backendUrl}/debug";
@@ -497,7 +427,6 @@ public class ProfilePanelController : MonoBehaviour
 
         using (UnityWebRequest request = UnityWebRequest.Get(url))
         {
-            // Set a timeout
             request.timeout = 5;
 
             yield return request.SendWebRequest();
@@ -512,7 +441,6 @@ public class ProfilePanelController : MonoBehaviour
                 Debug.LogError($"Connection to server failed: {request.error}");
                 ShowFeedback("Error: Could not connect to server. Make sure the backend server is running.", false);
 
-                // Let's save directly as a fallback (this is just for testing)
                 if (useHttpServiceForTesting)
                 {
                     Debug.Log("Falling back to direct save method");
@@ -523,10 +451,6 @@ public class ProfilePanelController : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Verify that the profile data was saved correctly
-    /// </summary>
-    /// <param name="expectedProfession">The profession that should have been saved</param>
     private IEnumerator VerifyProfileSaved(string expectedProfession)
     {
         if (logDetailedNetworkInfo)
@@ -534,7 +458,6 @@ public class ProfilePanelController : MonoBehaviour
             Debug.Log("Verifying profile data was saved correctly...");
         }
 
-        // Wait a moment to ensure data has been saved
         yield return new WaitForSeconds(0.5f);
 
         string url = $"{backendUrl}/profile?email={UnityWebRequest.EscapeURL(userEmail)}";
@@ -591,7 +514,6 @@ public class ProfilePanelController : MonoBehaviour
 
             feedbackPanel.SetActive(true);
 
-            // Hide the feedback panel after 3 seconds
             StartCoroutine(HideFeedbackAfterDelay(3f));
         }
         else
@@ -600,7 +522,6 @@ public class ProfilePanelController : MonoBehaviour
         }
     }
 
-    // New method that takes a Color parameter and forwards to the boolean version
     private void ShowFeedback(string message, Color color)
     {
         if (feedbackPanel != null && feedbackText != null)
@@ -610,12 +531,10 @@ public class ProfilePanelController : MonoBehaviour
 
             feedbackPanel.SetActive(true);
 
-            // Hide the feedback panel after 3 seconds
             StartCoroutine(HideFeedbackAfterDelay(3f));
         }
         else
         {
-            // Determine if this is a success based on color (green = success)
             bool isSuccess = color == Color.green;
             Debug.Log(isSuccess ? $"Success: {message}" : $"Error/Info: {message}");
         }
@@ -633,11 +552,9 @@ public class ProfilePanelController : MonoBehaviour
 
     void ApplyStyle()
     {
-        // Set panel background
         if (backgroundPanel != null)
             backgroundPanel.color = new Color(0.1f, 0.1f, 0.1f, 0.95f);
 
-        // Style title
         if (titleText != null)
         {
             titleText.text = "User Profile";
@@ -646,7 +563,6 @@ public class ProfilePanelController : MonoBehaviour
             titleText.color = Color.white;
         }
 
-        // Style email label
         Transform emailLabelTransform = transform.Find("Content/EmailLabel");
         if (emailLabelTransform != null)
         {
@@ -659,7 +575,6 @@ public class ProfilePanelController : MonoBehaviour
             }
         }
 
-        // Style profession label
         Transform professionLabelTransform = transform.Find("Content/ProfessionLabel");
         if (professionLabelTransform != null)
         {
@@ -672,15 +587,12 @@ public class ProfilePanelController : MonoBehaviour
             }
         }
 
-        // Style save button
         if (saveButton != null)
         {
-            // Get button image
             Image saveButtonImage = saveButton.GetComponent<Image>();
             if (saveButtonImage != null)
-                saveButtonImage.color = new Color(0f, 0.8f, 1f); // BlinkTap cyan
+                saveButtonImage.color = new Color(0f, 0.8f, 1f);
 
-            // Get button text
             TextMeshProUGUI saveButtonText = saveButton.GetComponentInChildren<TextMeshProUGUI>();
             if (saveButtonText != null)
             {
@@ -689,28 +601,18 @@ public class ProfilePanelController : MonoBehaviour
                 saveButtonText.fontStyle = FontStyles.Bold;
             }
 
-            // Make sure the button has an onClick event
             SetupSaveButton();
         }
     }
 
-    /// <summary>
-    /// Sends a web request and returns the result through a callback
-    /// </summary>
-    /// <param name="url">The URL to send the request to</param>
-    /// <param name="jsonData">The JSON data to send</param>
-    /// <param name="callback">Callback that receives success status and response data</param>
     private IEnumerator SendWebRequest(string url, string jsonData, Action<bool, string> callback)
     {
-        // Create a new web request
         UnityWebRequest request = new UnityWebRequest(url, "POST");
 
-        // Set up the request data
         byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
 
-        // Set headers
         request.SetRequestHeader("Content-Type", "application/json");
         request.SetRequestHeader("Accept", "application/json");
 
@@ -721,7 +623,6 @@ public class ProfilePanelController : MonoBehaviour
             Debug.Log($"Request body: {jsonData}");
         }
 
-        // Send the request
         yield return request.SendWebRequest();
 
         if (logDetailedNetworkInfo)
@@ -734,22 +635,16 @@ public class ProfilePanelController : MonoBehaviour
 
         if (!success && !string.IsNullOrEmpty(request.downloadHandler.text))
         {
-            // If we have an error response text, use that instead of the generic error
             response = request.downloadHandler.text;
             Debug.LogError($"Error response body: {response}");
         }
 
-        // Call the callback with the result
         callback(success, response);
 
-        // Clean up
         request.Dispose();
     }
 }
 
-/// <summary>
-/// Data structure for user profile information
-/// </summary>
 [System.Serializable]
 public class ProfileData
 {
@@ -757,9 +652,6 @@ public class ProfileData
     public string profession;
 }
 
-/// <summary>
-/// Error response structure for parsing error messages from the server
-/// </summary>
 [System.Serializable]
 public class ErrorResponse
 {
@@ -767,11 +659,9 @@ public class ErrorResponse
     public string details;
 }
 
-// Add new class to parse server response
 [System.Serializable]
 public class ServerResponse
 {
     public bool success;
     public string message;
-    // Add more fields as needed based on your server response
 }

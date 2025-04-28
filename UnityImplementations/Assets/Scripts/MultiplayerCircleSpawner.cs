@@ -9,7 +9,7 @@ public class MultiplayerCircleSpawner : MonoBehaviour
     [SerializeField] private float minSpawnInterval = 1f;
     [SerializeField] private float maxSpawnInterval = 2f;
     [SerializeField] private float circleSize = 1f;
-    [SerializeField] private int playerNumber = 1; // 1 for Player 1, 2 for Player 2
+    [SerializeField] private int playerNumber = 1;
 
     [Header("Spawn Area")]
     [SerializeField] private RectTransform spawnAreaRect;
@@ -39,7 +39,6 @@ public class MultiplayerCircleSpawner : MonoBehaviour
             }
         }
 
-        // Explicitly disable spawning at start
         isSpawning = false;
         spawnCoroutine = null;
 
@@ -48,13 +47,11 @@ public class MultiplayerCircleSpawner : MonoBehaviour
 
     private void OnDisable()
     {
-        // Make sure to stop when disabled
         StopSpawning();
     }
 
     private void OnDestroy()
     {
-        // Make sure to stop when destroyed
         StopSpawning();
     }
 
@@ -86,12 +83,11 @@ public class MultiplayerCircleSpawner : MonoBehaviour
     private IEnumerator SpawnCircles()
     {
         Debug.Log($"Player {playerNumber} SpawnCircles coroutine started");
-        while (isSpawning) // Only continue if spawning is active
+        while (isSpawning)
         {
             float waitTime = Random.Range(minSpawnInterval, maxSpawnInterval);
             yield return new WaitForSeconds(waitTime);
 
-            // Double-check we're still supposed to be spawning
             if (isSpawning && this.enabled && this.gameObject.activeInHierarchy)
             {
                 SpawnCircle();
@@ -129,25 +125,21 @@ public class MultiplayerCircleSpawner : MonoBehaviour
         Image imageRenderer = circleObject.GetComponent<Image>();
         if (imageRenderer != null)
         {
-            // Ensure the image is set up correctly for UI interaction
             imageRenderer.color = circleColors[colorIndex];
-            imageRenderer.raycastTarget = true; // Make sure raycast target is enabled
+            imageRenderer.raycastTarget = true;
 
-            // Add a Box Collider 2D if needed for better click detection
             if (circleObject.GetComponent<BoxCollider2D>() == null)
             {
                 BoxCollider2D collider = circleObject.AddComponent<BoxCollider2D>();
                 collider.size = new Vector2(circleRect.rect.width, circleRect.rect.height);
             }
 
-            // Add the multiplayer circle behavior and set player owner
             MultiplayerCircleBehavior circleBehavior = circleObject.GetComponent<MultiplayerCircleBehavior>();
             if (circleBehavior == null)
             {
                 circleBehavior = circleObject.AddComponent<MultiplayerCircleBehavior>();
             }
 
-            // Set the player owner
             circleBehavior.PlayerOwner = playerNumber;
 
             if (showDebugLogs)
