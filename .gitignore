@@ -10,6 +10,7 @@ UnityImplementations/Obj/
 UnityImplementations/Build/
 UnityImplementations/Builds/
 UnityImplementations/UserSettings/
+BlinkTap-Backend/firebaseKey.json
 
 # === Build artifacts ===
 *.apk
