@@ -152,7 +152,7 @@ public class MainMenuManager : MonoBehaviour
     void SetupUserInfo()
     {
         if (welcomeText != null)
-            welcomeText.text = "Welcome back, " + playerName;
+            welcomeText.text = "Welcome back!";
 
         if (readyText != null)
             readyText.text = "Ready to improve your reaction time?";

@@ -166,7 +166,3 @@ To contribute to this project, please follow the standard Git workflow:
 1. Fork the repository
 2. Create a feature branch
 3. Submit a pull request
-
-## License
-
-This project is licensed under the ISC License - see the LICENSE file for details.

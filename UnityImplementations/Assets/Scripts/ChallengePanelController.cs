@@ -13,6 +13,12 @@ public class ChallengePanelController : MonoBehaviour
     [SerializeField] private Button startButton;
     [SerializeField] private TextMeshProUGUI startButtonText;
 
+    private Color initialBackgroundColor;
+    private Vector2 initialAnchoredPosition;
+    private Vector2 initialSizeDelta;
+    private Vector2 initialAnchorMin;
+    private Vector2 initialAnchorMax;
+
     private UIElementStyler styler;
     private MainMenuManager menuManager;
     private FirebaseManager firebaseManager;
@@ -24,8 +30,20 @@ public class ChallengePanelController : MonoBehaviour
 
     private void Awake()
     {
+        RectTransform rt = transform as RectTransform;
+        if (rt != null)
+        {
+            initialAnchoredPosition = rt.anchoredPosition;
+            initialSizeDelta = rt.sizeDelta;
+            initialAnchorMin = rt.anchorMin;
+            initialAnchorMax = rt.anchorMax;
+        }
+
         if (backgroundPanel == null)
             backgroundPanel = GetComponent<Image>();
+
+        if (backgroundPanel != null)
+            initialBackgroundColor = backgroundPanel.color;
 
         if (titleText == null)
             titleText = transform.Find("Title")?.GetComponent<TextMeshProUGUI>();
@@ -93,13 +111,35 @@ public class ChallengePanelController : MonoBehaviour
             Debug.Log($"ChallengePanelController: bestScoreText is assigned: {bestScoreText.name} with text: {bestScoreText.text}");
         }
 
-        SetupChallengePanel();
+        SetupTexts();
 
         FetchBestScore();
 
         if (startButton != null)
         {
             startButton.onClick.AddListener(OnStartButtonClicked);
+        }
+    }
+
+    private void Update()
+    {
+        MaintainOriginalAppearance();
+    }
+
+    private void MaintainOriginalAppearance()
+    {
+        RectTransform rt = transform as RectTransform;
+        if (rt != null)
+        {
+            rt.anchoredPosition = initialAnchoredPosition;
+            rt.sizeDelta = initialSizeDelta;
+            rt.anchorMin = initialAnchorMin;
+            rt.anchorMax = initialAnchorMax;
+        }
+
+        if (backgroundPanel != null)
+        {
+            backgroundPanel.color = initialBackgroundColor;
         }
     }
 
@@ -150,7 +190,7 @@ public class ChallengePanelController : MonoBehaviour
         Debug.Log($"ChallengePanelController: Text updated successfully to: {bestScoreText.text}");
     }
 
-    public void SetupChallengePanel()
+    public void SetupTexts()
     {
         if (titleText != null)
         {
@@ -163,11 +203,6 @@ public class ChallengePanelController : MonoBehaviour
         {
             startButtonText.text = "START";
         }
-
-        if (styler != null)
-        {
-            styler.StyleChallengePanel(backgroundPanel, titleText, bestScoreText, null, startButton);
-        }
     }
 
     private void UpdateBestScoreText()
@@ -176,22 +211,13 @@ public class ChallengePanelController : MonoBehaviour
         {
             if (personalBest <= 0)
             {
-                bestScoreText.text = "No personal best yet, play now!";
-                bestScoreText.fontSize = 30f;
-                bestScoreText.fontStyle = TMPro.FontStyles.Bold;
                 bestScoreText.text = "No personal best yet, <color=#00CCFF>play now!</color>";
             }
             else
             {
                 bestScoreText.text = $"Beat your personal best: <color=#00CCFF>{personalBest}</color>ms";
-                bestScoreText.fontSize = 30f;
-                bestScoreText.fontStyle = TMPro.FontStyles.Bold;
             }
-
-            bestScoreText.characterSpacing = 1f;
-            bestScoreText.alignment = TMPro.TextAlignmentOptions.Center;
-
-            Debug.Log($"ChallengePanelController: Updated best score text: {bestScoreText.text}, Font size: {bestScoreText.fontSize}");
+            Debug.Log($"ChallengePanelController: Updated best score text: {bestScoreText.text}");
         }
         else
         {
@@ -210,6 +236,19 @@ public class ChallengePanelController : MonoBehaviour
         if (menuManager != null)
         {
             Debug.Log("Starting today's challenge");
+            menuManager.LoadGameMode("Solo");
+        }
+        else
+        {
+            Debug.LogWarning("ChallengePanelController: menuManager is null, trying to load Solo scene directly");
+            try
+            {
+                UnityEngine.SceneManagement.SceneManager.LoadScene("Solo");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError("Failed to load Solo scene: " + e.Message);
+            }
         }
     }
 

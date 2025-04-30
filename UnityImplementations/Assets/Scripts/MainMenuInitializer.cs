@@ -72,7 +72,7 @@ public class MainMenuInitializer : MonoBehaviour
             appTitleText.text = appTitle;
 
         if (welcomeTextDisplay != null)
-            welcomeTextDisplay.text = "Welcome back, " + userName;
+            welcomeTextDisplay.text = "Welcome back!";
 
         if (statsLabel != null)
             statsLabel.text = "Your Stats";
@@ -129,7 +129,7 @@ public class MainMenuInitializer : MonoBehaviour
             if (welcomeTextDisplay != null)
             {
                 string username = userEmail.Split('@')[0];
-                welcomeTextDisplay.text = "Welcome back, " + username;
+                welcomeTextDisplay.text = "Welcome back!";
             }
         }
         else

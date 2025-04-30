@@ -112,7 +112,17 @@ public class UIElementStyler : MonoBehaviour
     {
         if (backgroundPanel == null) return;
 
-        backgroundPanel.color = headerPanelColor;
+        bool isReactionTimePanel = false;
+        if (backgroundPanel.transform.name == "ReactionTimePanel" ||
+            (backgroundPanel.transform.parent != null && backgroundPanel.transform.parent.name == "ReactionTimePanel"))
+        {
+            isReactionTimePanel = true;
+        }
+
+        if (!isReactionTimePanel)
+        {
+            backgroundPanel.color = headerPanelColor;
+        }
 
         if (titleText != null)
         {

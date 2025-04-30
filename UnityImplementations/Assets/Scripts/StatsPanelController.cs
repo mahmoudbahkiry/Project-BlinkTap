@@ -17,14 +17,52 @@ public class StatsPanelController : MonoBehaviour
 
     private UIElementStyler styler;
 
+    private RectTransform myRectTransform;
+    private Vector2 originalAnchorMin;
+    private Vector2 originalAnchorMax;
+    private Vector2 originalSizeDelta;
+    private Vector2 originalAnchoredPosition;
+    private Vector3 originalScale;
+    private Color originalBackgroundColor;
+    private bool initialValuesStored = false;
+
+    private void StoreInitialValues()
+    {
+        if (initialValuesStored) return;
+
+        myRectTransform = transform as RectTransform;
+        if (myRectTransform != null)
+        {
+            originalAnchorMin = myRectTransform.anchorMin;
+            originalAnchorMax = myRectTransform.anchorMax;
+            originalSizeDelta = myRectTransform.sizeDelta;
+            originalAnchoredPosition = myRectTransform.anchoredPosition;
+            originalScale = myRectTransform.localScale;
+        }
+
+        if (backgroundPanel != null)
+        {
+            originalBackgroundColor = backgroundPanel.color;
+        }
+
+        initialValuesStored = true;
+    }
+
     private void Awake()
     {
         Debug.Log($"StatsPanelController: Awake called on {gameObject.name}");
+
+        StoreInitialValues();
 
         if (backgroundPanel == null)
         {
             backgroundPanel = GetComponent<Image>();
             Debug.Log($"StatsPanelController: Found backgroundPanel: {(backgroundPanel != null ? "Yes" : "No")}");
+
+            if (backgroundPanel != null && !initialValuesStored)
+            {
+                originalBackgroundColor = backgroundPanel.color;
+            }
         }
 
         if (titleText == null)
@@ -93,10 +131,36 @@ public class StatsPanelController : MonoBehaviour
 
     void Start()
     {
+        StoreInitialValues();
+
         if (styler == null)
             styler = FindObjectOfType<UIElementStyler>();
 
         SetupStatPanel();
+    }
+
+    void Update()
+    {
+        MaintainOriginalAppearance();
+    }
+
+    private void MaintainOriginalAppearance()
+    {
+        if (!initialValuesStored) return;
+
+        if (myRectTransform != null)
+        {
+            myRectTransform.anchorMin = originalAnchorMin;
+            myRectTransform.anchorMax = originalAnchorMax;
+            myRectTransform.sizeDelta = originalSizeDelta;
+            myRectTransform.anchoredPosition = originalAnchoredPosition;
+            myRectTransform.localScale = originalScale;
+        }
+
+        if (backgroundPanel != null)
+        {
+            backgroundPanel.color = originalBackgroundColor;
+        }
     }
 
     public void SetupStatPanel()
@@ -106,14 +170,18 @@ public class StatsPanelController : MonoBehaviour
             titleText.text = GetStatTitle();
         }
 
-        if (styler != null)
+        if (styler != null && !initialValuesStored)
         {
+            Color origColor = backgroundPanel != null ? backgroundPanel.color : Color.white;
+
             styler.StyleStatsPanel(
                 backgroundPanel,
                 titleText,
                 valueText,
                 changeText,
                 IsPositiveChange());
+
+            StoreInitialValues();
         }
     }
 
@@ -137,20 +205,6 @@ public class StatsPanelController : MonoBehaviour
             changeText.text = change;
             Debug.Log($"StatsPanelController: changeText updated to '{change}'");
 
-            if (styler != null)
-            {
-                styler.StyleStatsPanel(
-                    backgroundPanel,
-                    titleText,
-                    valueText,
-                    changeText,
-                    isPositive);
-                Debug.Log("StatsPanelController: Styling applied to panel");
-            }
-            else
-            {
-                Debug.LogWarning("StatsPanelController: styler is null, cannot apply styling");
-            }
         }
         else
         {
