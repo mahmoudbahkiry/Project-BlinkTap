@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 
 public class FirebaseManager : MonoBehaviour
 {
@@ -88,24 +87,11 @@ public class FirebaseManager : MonoBehaviour
 
         string jsonData = JsonUtility.ToJson(scoreData);
 
-        using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
+        yield return StartCoroutine(RESTClient.SendRequest(url, RESTClient.RequestType.POST, jsonData, response =>
         {
-            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
-            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.SetRequestHeader("Content-Type", "application/json");
-
-            yield return request.SendWebRequest();
-
-            bool success = false;
-
-            if (request.result == UnityWebRequest.Result.Success)
-            {
-                success = true;
-            }
-
+            bool success = response.IsSuccess;
             callback?.Invoke(success);
-        }
+        }));
     }
 
     public void GetBestScore(Action<int> callback)
@@ -121,24 +107,22 @@ public class FirebaseManager : MonoBehaviour
 
     private IEnumerator GetBestScoreCoroutine(Action<int> callback)
     {
-        string url = $"{backendUrl}/best-score?email={UnityWebRequest.EscapeURL(userEmail)}";
+        string url = $"{backendUrl}/best-score?email={RESTClient.EscapeURL(userEmail)}";
 
-        using (UnityWebRequest request = UnityWebRequest.Get(url))
+        yield return StartCoroutine(RESTClient.SendRequest(url, RESTClient.RequestType.GET, null, response =>
         {
-            yield return request.SendWebRequest();
-
             int bestScore = 0;
 
-            if (request.result == UnityWebRequest.Result.Success)
+            if (response.IsSuccess)
             {
-                string responseText = request.downloadHandler.text;
+                string responseText = response.Text;
 
                 try
                 {
-                    BestScoreResponse response = JsonUtility.FromJson<BestScoreResponse>(responseText);
-                    if (response != null && response.bestScore > 0)
+                    BestScoreResponse scoreResponse = JsonUtility.FromJson<BestScoreResponse>(responseText);
+                    if (scoreResponse != null && scoreResponse.bestScore > 0)
                     {
-                        bestScore = response.bestScore;
+                        bestScore = scoreResponse.bestScore;
                     }
                 }
                 catch (Exception e)
@@ -148,7 +132,7 @@ public class FirebaseManager : MonoBehaviour
             }
 
             callback?.Invoke(bestScore);
-        }
+        }));
     }
 
     public void GetMostRecentReactionTime(Action<float> callback)
@@ -164,26 +148,22 @@ public class FirebaseManager : MonoBehaviour
 
     private IEnumerator GetMostRecentReactionTimeCoroutine(Action<float> callback)
     {
-        string url = $"{backendUrl}/most-recent-score?email={UnityWebRequest.EscapeURL(userEmail)}";
+        string url = $"{backendUrl}/most-recent-score?email={RESTClient.EscapeURL(userEmail)}";
 
-        using (UnityWebRequest request = UnityWebRequest.Get(url))
+        yield return StartCoroutine(RESTClient.SendRequest(url, RESTClient.RequestType.GET, null, response =>
         {
-            request.timeout = 10;
-
-            yield return request.SendWebRequest();
-
             float recentTime = 0;
 
-            if (request.result == UnityWebRequest.Result.Success)
+            if (response.IsSuccess)
             {
-                string responseText = request.downloadHandler.text;
+                string responseText = response.Text;
 
                 try
                 {
-                    RecentScoreResponse response = JsonUtility.FromJson<RecentScoreResponse>(responseText);
-                    if (response != null && response.recentScore > 0)
+                    RecentScoreResponse scoreResponse = JsonUtility.FromJson<RecentScoreResponse>(responseText);
+                    if (scoreResponse != null && scoreResponse.recentScore > 0)
                     {
-                        recentTime = response.recentScore;
+                        recentTime = scoreResponse.recentScore;
 
                         PlayerPrefs.SetFloat(ReactionTimeManager.LAST_REACTION_TIME_KEY, recentTime);
                         PlayerPrefs.SetInt(ReactionTimeManager.HAS_REACTION_TIME_DATA_KEY, 1);
@@ -196,7 +176,7 @@ public class FirebaseManager : MonoBehaviour
             }
 
             callback?.Invoke(recentTime);
-        }
+        }));
     }
 
     public void CheckServerConnection(Action<bool> callback = null)
@@ -208,15 +188,11 @@ public class FirebaseManager : MonoBehaviour
     {
         string url = $"{backendUrl}/debug";
 
-        using (UnityWebRequest request = UnityWebRequest.Get(url))
+        yield return StartCoroutine(RESTClient.SendRequest(url, RESTClient.RequestType.GET, null, response =>
         {
-            request.timeout = 5;
-            yield return request.SendWebRequest();
-
-            bool isConnected = request.result == UnityWebRequest.Result.Success;
-
+            bool isConnected = response.IsSuccess;
             callback?.Invoke(isConnected);
-        }
+        }));
     }
 
     public string GetBackendUrl()

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using UnityEngine.Networking;
 using System.Text;
 using System;
 
@@ -233,51 +232,50 @@ public class ProfilePanelController : MonoBehaviour
             yield break;
         }
 
-        string url = $"{backendUrl}/profile?email={UnityWebRequest.EscapeURL(userEmail)}";
+        string url = $"{backendUrl}/profile?email={RESTClient.EscapeURL(userEmail)}";
         Debug.Log($"Loading profile data from: {url}");
 
-        using (UnityWebRequest request = UnityWebRequest.Get(url))
+        yield return StartCoroutine(RESTClient.SendRequest(url, RESTClient.RequestType.GET, null, response =>
         {
-            yield return request.SendWebRequest();
-
-            if (request.result == UnityWebRequest.Result.Success)
+            if (response.IsSuccess)
             {
-                string response = request.downloadHandler.text;
-                Debug.Log($"Profile data received: {response}");
+                string responseText = response.Text;
+                Debug.Log($"Profile data received: {responseText}");
 
                 try
                 {
-                    ProfileData profileData = JsonUtility.FromJson<ProfileData>(response);
-
-                    if (profileData != null && professionDropdown != null)
+                    ProfileData profileData = JsonUtility.FromJson<ProfileData>(responseText);
+                    if (profileData != null && !string.IsNullOrEmpty(profileData.profession))
                     {
-                        Debug.Log($"Setting profession dropdown to: {profileData.profession}");
-
-                        for (int i = 0; i < professionDropdown.options.Count; i++)
+                        int professionIndex = -1;
+                        if (professionDropdown != null)
                         {
-                            if (professionDropdown.options[i].text == profileData.profession)
+                            for (int i = 0; i < professionDropdown.options.Count; i++)
                             {
-                                professionDropdown.value = i;
-                                Debug.Log($"Set profession dropdown to index {i}");
-                                break;
+                                if (professionDropdown.options[i].text == profileData.profession)
+                                {
+                                    professionIndex = i;
+                                    break;
+                                }
+                            }
+
+                            if (professionIndex >= 0)
+                            {
+                                professionDropdown.value = professionIndex;
                             }
                         }
                     }
-                    else
-                    {
-                        Debug.LogWarning($"Profile data was null or dropdown not found. Data: {response}");
-                    }
                 }
-                catch (System.Exception e)
+                catch (Exception e)
                 {
-                    Debug.LogError($"Error parsing profile data: {e.Message}, Response: {response}");
+                    Debug.LogError($"Error parsing profile data: {e.Message}");
                 }
             }
             else
             {
-                Debug.LogError($"Failed to load profile data: {request.error}, Response code: {request.responseCode}");
+                Debug.LogError($"Error loading profile data: {response.Error}");
             }
-        }
+        }));
     }
 
     public void SaveProfileData()
@@ -320,88 +318,64 @@ public class ProfilePanelController : MonoBehaviour
             return;
         }
 
-        StartCoroutine(TestConnection(() =>
-        {
-            StartCoroutine(SendProfileDataToServer(userEmail, selectedProfession));
-        }));
+        StartCoroutine(SendProfileDataToServer(userEmail, selectedProfession));
     }
 
     private IEnumerator SendProfileDataToServer(string email, string profession)
     {
-        Debug.Log("SendProfileDataToServer method started");
-
-        if (saveButton != null)
+        yield return StartCoroutine(TestConnection(onSuccess: () =>
         {
-            saveButton.interactable = false;
-            TextMeshProUGUI buttonText = saveButton.GetComponentInChildren<TextMeshProUGUI>();
-            if (buttonText != null)
+            if (useHttpServiceForTesting)
             {
-                buttonText.text = "SAVING...";
-            }
-        }
-
-        string url = $"{backendUrl}/profile";
-
-        Debug.Log($"Using endpoint: {url}");
-
-        ProfileData profileData = new ProfileData
-        {
-            email = email,
-            profession = profession
-        };
-
-        string jsonData = JsonUtility.ToJson(profileData);
-        Debug.Log($"Sending profile data: {jsonData} to {url}");
-
-        yield return StartCoroutine(SendWebRequest(url, jsonData, (success, response) =>
-        {
-            if (saveButton != null)
-            {
-                saveButton.interactable = true;
-                TextMeshProUGUI buttonText = saveButton.GetComponentInChildren<TextMeshProUGUI>();
-                if (buttonText != null)
-                {
-                    buttonText.text = "SAVE";
-                }
-            }
-
-            if (success)
-            {
-                Debug.Log($"Profile saved successfully. Server response: {response}");
-
-                try
-                {
-                    ServerResponse serverResponse = JsonUtility.FromJson<ServerResponse>(response);
-                    Debug.Log($"Response details - Success: {serverResponse.success}, Message: {serverResponse.message}");
-
-                    if (serverResponse.success)
-                    {
-                        ShowFeedback("Profile saved successfully!", Color.green);
-                    }
-                    else
-                    {
-                        ShowFeedback($"Error: {serverResponse.message}", Color.red);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError($"Error parsing server response: {e.Message}");
-                    ShowFeedback("Profile saved, but response format unexpected", Color.yellow);
-                }
+                StartCoroutine(DirectFirestoreSave(profession));
             }
             else
             {
-                Debug.LogError($"Failed to save profile. Error: {response}");
+                ProfileData profileData = new ProfileData
+                {
+                    email = email,
+                    profession = profession
+                };
 
-                if (response.Contains("Cannot POST"))
+                string jsonData = JsonUtility.ToJson(profileData);
+                string url = $"{backendUrl}/profile";
+
+                if (logDetailedNetworkInfo)
                 {
-                    Debug.LogWarning("API endpoint issue detected. Falling back to test mode.");
-                    StartCoroutine(DirectFirestoreSave(profession));
+                    Debug.Log($"Sending profile data to: {url}");
+                    Debug.Log($"JSON data: {jsonData}");
                 }
-                else
+
+                StartCoroutine(RESTClient.SendRequest(url, RESTClient.RequestType.POST, jsonData, response =>
                 {
-                    ShowFeedback("Failed to save profile. Please try again.", Color.red);
-                }
+                    if (response.IsSuccess)
+                    {
+                        Debug.Log("Profile data saved successfully");
+                        ShowFeedback("Profile updated successfully!", true);
+
+                        // Verify the data was saved correctly
+                        StartCoroutine(VerifyProfileSaved(profession));
+                    }
+                    else
+                    {
+                        Debug.LogError($"Error saving profile data: {response.Error}");
+                        string errorMsg = "Could not update profile";
+
+                        try
+                        {
+                            ErrorResponse errorResponse = JsonUtility.FromJson<ErrorResponse>(response.Text);
+                            if (errorResponse != null && !string.IsNullOrEmpty(errorResponse.error))
+                            {
+                                errorMsg = errorResponse.error;
+                            }
+                        }
+                        catch { }
+
+                        ShowFeedback(errorMsg, false);
+                    }
+
+                    isSaving = false;
+                }));
             }
         }));
     }
@@ -423,86 +397,62 @@ public class ProfilePanelController : MonoBehaviour
     private IEnumerator TestConnection(System.Action onSuccess = null)
     {
         string url = $"{backendUrl}/debug";
-        Debug.Log($"Testing connection to server: {url}");
 
-        using (UnityWebRequest request = UnityWebRequest.Get(url))
+        yield return StartCoroutine(RESTClient.SendRequest(url, RESTClient.RequestType.GET, null, response =>
         {
-            request.timeout = 5;
+            bool isConnected = response.IsSuccess;
 
-            yield return request.SendWebRequest();
-
-            if (request.result == UnityWebRequest.Result.Success)
+            if (isConnected)
             {
-                Debug.Log("Connection to server successful!");
+                Debug.Log("Server connection test successful");
                 onSuccess?.Invoke();
             }
             else
             {
-                Debug.LogError($"Connection to server failed: {request.error}");
-                ShowFeedback("Error: Could not connect to server. Make sure the backend server is running.", false);
-
-                if (useHttpServiceForTesting)
-                {
-                    Debug.Log("Falling back to direct save method");
-                    string selectedProfession = professionDropdown.options[professionDropdown.value].text;
-                    StartCoroutine(DirectFirestoreSave(selectedProfession));
-                }
+                Debug.LogError($"Server connection test failed: {response.Error}");
+                ShowFeedback("Could not connect to server", false);
+                isSaving = false;
             }
-        }
+        }));
     }
 
     private IEnumerator VerifyProfileSaved(string expectedProfession)
     {
-        if (logDetailedNetworkInfo)
+        string url = $"{backendUrl}/profile?email={RESTClient.EscapeURL(userEmail)}";
+
+        yield return StartCoroutine(RESTClient.SendRequest(url, RESTClient.RequestType.GET, null, response =>
         {
-            Debug.Log("Verifying profile data was saved correctly...");
-        }
-
-        yield return new WaitForSeconds(0.5f);
-
-        string url = $"{backendUrl}/profile?email={UnityWebRequest.EscapeURL(userEmail)}";
-
-        using (UnityWebRequest request = UnityWebRequest.Get(url))
-        {
-            yield return request.SendWebRequest();
-
-            if (request.result == UnityWebRequest.Result.Success)
+            if (response.IsSuccess)
             {
-                string response = request.downloadHandler.text;
-
-                if (logDetailedNetworkInfo)
-                {
-                    Debug.Log($"Verification response: {response}");
-                }
-
                 try
                 {
-                    ProfileData profileData = JsonUtility.FromJson<ProfileData>(response);
+                    ProfileData profileData = JsonUtility.FromJson<ProfileData>(response.Text);
                     if (profileData != null)
                     {
-                        if (profileData.profession == expectedProfession)
+                        if (profileData.profession != expectedProfession)
                         {
-                            if (logDetailedNetworkInfo)
-                            {
-                                Debug.Log("Verification successful: data matches what was saved");
-                            }
+                            Debug.LogWarning($"Verification mismatch: Expected profession '{expectedProfession}' but got '{profileData.profession}'");
                         }
                         else
                         {
-                            Debug.LogWarning($"Verification warning: expected profession '{expectedProfession}' but got '{profileData.profession}'");
+                            Debug.Log("Profile data verification successful - data matches what was saved");
                         }
                     }
+                    else
+                    {
+                        Debug.LogError("Verification failed: Could not parse profile data from response");
+                    }
                 }
-                catch (System.Exception e)
+                catch (Exception e)
                 {
-                    Debug.LogError($"Error verifying saved data: {e.Message}");
+                    Debug.LogError($"Error during profile verification: {e.Message}");
                 }
             }
             else
             {
-                Debug.LogWarning($"Could not verify saved data: {request.error}");
+                Debug.LogError($"Verification request failed: {response.Error}");
             }
-        }
+        }));
     }
 
     private void ShowFeedback(string message, bool success)
@@ -607,41 +557,17 @@ public class ProfilePanelController : MonoBehaviour
 
     private IEnumerator SendWebRequest(string url, string jsonData, Action<bool, string> callback)
     {
-        UnityWebRequest request = new UnityWebRequest(url, "POST");
-
-        byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
-        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-        request.downloadHandler = new DownloadHandlerBuffer();
-
-        request.SetRequestHeader("Content-Type", "application/json");
-        request.SetRequestHeader("Accept", "application/json");
-
-        if (logDetailedNetworkInfo)
+        yield return StartCoroutine(RESTClient.SendRequest(url, RESTClient.RequestType.POST, jsonData, response =>
         {
-            Debug.Log($"Sending POST request to: {url}");
-            Debug.Log($"Request headers: Content-Type: application/json, Accept: application/json");
-            Debug.Log($"Request body: {jsonData}");
-        }
-
-        yield return request.SendWebRequest();
-
-        if (logDetailedNetworkInfo)
-        {
-            Debug.Log($"Request completed. Result: {request.result}, Response Code: {request.responseCode}");
-        }
-
-        bool success = request.result == UnityWebRequest.Result.Success;
-        string response = success ? request.downloadHandler.text : request.error;
-
-        if (!success && !string.IsNullOrEmpty(request.downloadHandler.text))
-        {
-            response = request.downloadHandler.text;
-            Debug.LogError($"Error response body: {response}");
-        }
-
-        callback(success, response);
-
-        request.Dispose();
+            if (response.IsSuccess)
+            {
+                callback?.Invoke(true, response.Text);
+            }
+            else
+            {
+                callback?.Invoke(false, response.Error);
+            }
+        }));
     }
 }
 

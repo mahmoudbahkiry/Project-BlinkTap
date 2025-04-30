@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using UnityEngine.Networking;
-using System.Text;
+
 public class TestServerConnection : MonoBehaviour
 {
     [Header("Configuration")]
@@ -54,45 +53,41 @@ public class TestServerConnection : MonoBehaviour
         string url = $"{backendUrl}/debug";
         LogMessage($"Sending GET request to {url}");
 
-        using (UnityWebRequest request = UnityWebRequest.Get(url))
+        yield return StartCoroutine(RESTClient.SendRequest(url, RESTClient.RequestType.GET, null, response =>
         {
-            yield return request.SendWebRequest();
-
-            if (request.result == UnityWebRequest.Result.Success)
+            if (response.IsSuccess)
             {
-                string response = request.downloadHandler.text;
+                string responseText = response.Text;
                 LogMessage("Connection successful!");
-                LogMessage($"Response: {response}");
+                LogMessage($"Response: {responseText}");
             }
             else
             {
-                LogError($"Connection failed: {request.error}");
-                LogError($"Response code: {request.responseCode}");
+                LogError($"Connection failed: {response.Error}");
+                LogError($"Response code: {response.StatusCode}");
             }
-        }
+        }));
     }
 
     private IEnumerator TestGetProfileData()
     {
-        string url = $"{backendUrl}/profile?email={UnityWebRequest.EscapeURL(testEmail)}";
+        string url = $"{backendUrl}/profile?email={RESTClient.EscapeURL(testEmail)}";
         LogMessage($"Sending GET request to {url}");
 
-        using (UnityWebRequest request = UnityWebRequest.Get(url))
+        yield return StartCoroutine(RESTClient.SendRequest(url, RESTClient.RequestType.GET, null, response =>
         {
-            yield return request.SendWebRequest();
-
-            if (request.result == UnityWebRequest.Result.Success)
+            if (response.IsSuccess)
             {
-                string response = request.downloadHandler.text;
+                string responseText = response.Text;
                 LogMessage("Get profile successful!");
-                LogMessage($"Response: {response}");
+                LogMessage($"Response: {responseText}");
             }
             else
             {
-                LogError($"Get profile failed: {request.error}");
-                LogError($"Response code: {request.responseCode}");
+                LogError($"Get profile failed: {response.Error}");
+                LogError($"Response code: {response.StatusCode}");
             }
-        }
+        }));
     }
 
     private IEnumerator TestSaveProfileData()
@@ -108,78 +103,70 @@ public class TestServerConnection : MonoBehaviour
         string jsonData = JsonUtility.ToJson(profileData);
         LogMessage($"Sending POST to echo endpoint with data: {jsonData}");
 
-        using (UnityWebRequest echoRequest = new UnityWebRequest(url, "POST"))
+        bool shouldContinue = true;
+        yield return StartCoroutine(RESTClient.SendRequest(url, RESTClient.RequestType.POST, jsonData, response =>
         {
-            byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
-            echoRequest.uploadHandler = new UploadHandlerRaw(bodyRaw);
-            echoRequest.downloadHandler = new DownloadHandlerBuffer();
-            echoRequest.SetRequestHeader("Content-Type", "application/json");
-
-            yield return echoRequest.SendWebRequest();
-
-            if (echoRequest.result == UnityWebRequest.Result.Success)
+            if (response.IsSuccess)
             {
-                string echoResponse = echoRequest.downloadHandler.text;
+                string echoResponse = response.Text;
                 LogMessage("Echo test successful!");
                 LogMessage($"Echo response: {echoResponse}");
             }
             else
             {
-                LogError($"Echo test failed: {echoRequest.error}");
-                LogError($"Response code: {echoRequest.responseCode}");
+                LogError($"Echo test failed: {response.Error}");
+                LogError($"Response code: {response.StatusCode}");
                 LogError("Skipping actual profile save test due to echo failure");
-                yield break;
+                shouldContinue = false;
             }
+        }));
+
+        if (!shouldContinue)
+        {
+            yield break;
         }
+
         url = $"{backendUrl}/profile";
         LogMessage($"Sending POST to profile endpoint with data: {jsonData}");
 
-        using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
+        yield return StartCoroutine(RESTClient.SendRequest(url, RESTClient.RequestType.POST, jsonData, response =>
         {
-            byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
-            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.SetRequestHeader("Content-Type", "application/json");
-
-            yield return request.SendWebRequest();
-
-            if (request.result == UnityWebRequest.Result.Success)
+            if (response.IsSuccess)
             {
-                string response = request.downloadHandler.text;
+                string responseText = response.Text;
                 LogMessage("Save profile successful!");
-                LogMessage($"Response: {response}");
+                LogMessage($"Response: {responseText}");
                 LogMessage("Verifying saved data...");
                 StartCoroutine(VerifySavedData());
             }
             else
             {
-                LogError($"Save profile failed: {request.error}");
-                LogError($"Response code: {request.responseCode}");
-                LogError($"Response body: {request.downloadHandler.text}");
+                LogError($"Save profile failed: {response.Error}");
+                LogError($"Response code: {response.StatusCode}");
+                LogError($"Response body: {response.Text}");
                 LogError("Request details:");
                 LogError($"URL: {url}");
                 LogError($"Method: POST");
                 LogError($"Headers: Content-Type: application/json");
                 LogError($"Body: {jsonData}");
             }
-        }
+        }));
     }
 
     private IEnumerator VerifySavedData()
     {
-        string url = $"{backendUrl}/profile?email={UnityWebRequest.EscapeURL(testEmail)}";
-        using (UnityWebRequest request = UnityWebRequest.Get(url))
-        {
-            yield return request.SendWebRequest();
+        string url = $"{backendUrl}/profile?email={RESTClient.EscapeURL(testEmail)}";
 
-            if (request.result == UnityWebRequest.Result.Success)
+        yield return StartCoroutine(RESTClient.SendRequest(url, RESTClient.RequestType.GET, null, response =>
+        {
+            if (response.IsSuccess)
             {
-                string response = request.downloadHandler.text;
-                LogMessage($"Verification response: {response}");
+                string responseText = response.Text;
+                LogMessage($"Verification response: {responseText}");
 
                 try
                 {
-                    TestProfileData profileData = JsonUtility.FromJson<TestProfileData>(response);
+                    TestProfileData profileData = JsonUtility.FromJson<TestProfileData>(responseText);
                     if (profileData != null && profileData.profession == testProfession)
                     {
                         LogMessage("Verification SUCCESSFUL! Data matches what was saved.");
@@ -196,9 +183,9 @@ public class TestServerConnection : MonoBehaviour
             }
             else
             {
-                LogError($"Verification request failed: {request.error}");
+                LogError($"Verification request failed: {response.Error}");
             }
-        }
+        }));
     }
 
     private void LogMessage(string message)

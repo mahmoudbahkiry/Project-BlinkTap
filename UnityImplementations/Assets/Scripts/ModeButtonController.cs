@@ -7,7 +7,7 @@ using TMPro;
 public class ModeButtonController : MonoBehaviour
 {
     [Header("Button Configuration")]
-    [SerializeField] private ModeType modeType = ModeType.Solo;
+    public ModeType modeType = ModeType.Solo;
     [SerializeField] private string modeName = "Solo";
     [SerializeField] private string modeDescription = "Train your reflexes";
     [SerializeField] private Sprite modeIcon;

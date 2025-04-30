@@ -194,7 +194,7 @@ public class MainMenuManager : MonoBehaviour
         else
         {
             if (reactionTimeText != null)
-                reactionTimeText.text = "No reaction time yet";
+                reactionTimeText.text = "No tests taken yet";
 
             if (reactionTimeChangeText != null)
                 reactionTimeChangeText.text = "";
@@ -225,10 +225,16 @@ public class MainMenuManager : MonoBehaviour
             homeButton.onClick.AddListener(() => SwitchTab("Home"));
 
         if (soloNavButton != null)
+        {
             soloNavButton.onClick.AddListener(() => SwitchTab("Solo"));
+            soloNavButton.gameObject.SetActive(false);
+        }
 
         if (multiplayerNavButton != null)
+        {
             multiplayerNavButton.onClick.AddListener(() => SwitchTab("Multiplayer"));
+            multiplayerNavButton.gameObject.SetActive(false);
+        }
 
         if (profileButton != null)
             profileButton.onClick.AddListener(() => SwitchTab("Profile"));
@@ -376,40 +382,40 @@ public class MainMenuManager : MonoBehaviour
                 break;
         }
 
+        // Restore the call to maintain tab switching functionality
         UpdateNavButtonAppearance();
     }
 
     void UpdateNavButtonAppearance()
     {
-        Color activeColor = new Color(0f, 0.8f, 1f);
-        Color inactiveColor = new Color(0.7f, 0.7f, 0.7f);
-
+        // Modified to only set the active state but not change colors
+        // This will make it respect the colors set in the editor
         if (homeButton != null)
         {
             TextMeshProUGUI buttonText = homeButton.GetComponentInChildren<TextMeshProUGUI>();
             if (buttonText != null)
             {
-                buttonText.color = currentTab == "Home" ? activeColor : inactiveColor;
+                // Keep current color (from editor) but update the font style
                 buttonText.fontStyle = currentTab == "Home" ? FontStyles.Bold : FontStyles.Normal;
             }
         }
 
-        if (soloNavButton != null)
+        if (soloNavButton != null && soloNavButton.gameObject.activeSelf)
         {
             TextMeshProUGUI buttonText = soloNavButton.GetComponentInChildren<TextMeshProUGUI>();
             if (buttonText != null)
             {
-                buttonText.color = currentTab == "Solo" ? activeColor : inactiveColor;
+                // Keep current color (from editor) but update the font style
                 buttonText.fontStyle = currentTab == "Solo" ? FontStyles.Bold : FontStyles.Normal;
             }
         }
 
-        if (multiplayerNavButton != null)
+        if (multiplayerNavButton != null && multiplayerNavButton.gameObject.activeSelf)
         {
             TextMeshProUGUI buttonText = multiplayerNavButton.GetComponentInChildren<TextMeshProUGUI>();
             if (buttonText != null)
             {
-                buttonText.color = currentTab == "Multiplayer" ? activeColor : inactiveColor;
+                // Keep current color (from editor) but update the font style
                 buttonText.fontStyle = currentTab == "Multiplayer" ? FontStyles.Bold : FontStyles.Normal;
             }
         }
@@ -419,7 +425,7 @@ public class MainMenuManager : MonoBehaviour
             TextMeshProUGUI buttonText = profileButton.GetComponentInChildren<TextMeshProUGUI>();
             if (buttonText != null)
             {
-                buttonText.color = currentTab == "Profile" ? activeColor : inactiveColor;
+                // Keep current color (from editor) but update the font style
                 buttonText.fontStyle = currentTab == "Profile" ? FontStyles.Bold : FontStyles.Normal;
             }
         }

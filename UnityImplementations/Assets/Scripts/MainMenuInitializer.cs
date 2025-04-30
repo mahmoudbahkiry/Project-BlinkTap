@@ -143,27 +143,72 @@ public class MainMenuInitializer : MonoBehaviour
         if (gameModeContainer == null || soloModeButtonPrefab == null || multiplayerModeButtonPrefab == null)
             return;
 
+        // Check if buttons already exist in the scene
+        GameObject soloButtonObj = null;
+        GameObject multiplayerButtonObj = null;
+
+        // Look for existing buttons
         foreach (Transform child in gameModeContainer)
         {
-            Destroy(child.gameObject);
+            ModeButtonController controller = child.GetComponent<ModeButtonController>();
+            if (controller != null)
+            {
+                if (controller.modeType == ModeType.Solo)
+                    soloButtonObj = child.gameObject;
+                else if (controller.modeType == ModeType.Multiplayer)
+                    multiplayerButtonObj = child.gameObject;
+            }
         }
 
-        GameObject soloButtonObj = Instantiate(soloModeButtonPrefab, gameModeContainer);
-        ConfigureModeButton(
-            soloButtonObj,
-            ModeType.Solo,
-            "Solo",
-            "Train your reflexes",
-            soloModeIcon);
+        // Only create buttons if they don't already exist
+        if (soloButtonObj == null)
+        {
+            soloButtonObj = Instantiate(soloModeButtonPrefab, gameModeContainer);
+            ConfigureModeButton(
+                soloButtonObj,
+                ModeType.Solo,
+                "Solo",
+                "Train your reflexes",
+                soloModeIcon);
+        }
+        else
+        {
+            // Just ensure the button has the right event handlers
+            Button button = soloButtonObj.GetComponent<Button>();
+            if (button != null && menuManager != null)
+            {
+                button.onClick.RemoveAllListeners();
+                button.onClick.AddListener(() => menuManager.LoadGameMode("Solo"));
+            }
+        }
 
-        GameObject multiplayerButtonObj = Instantiate(multiplayerModeButtonPrefab, gameModeContainer);
-        ConfigureModeButton(
-            multiplayerButtonObj,
-            ModeType.Multiplayer,
-            "Multiplayer",
-            "Battle friends",
-            multiplayerModeIcon);
+        if (multiplayerButtonObj == null)
+        {
+            multiplayerButtonObj = Instantiate(multiplayerModeButtonPrefab, gameModeContainer);
+            ConfigureModeButton(
+                multiplayerButtonObj,
+                ModeType.Multiplayer,
+                "Multiplayer",
+                "Battle friends",
+                multiplayerModeIcon);
+        }
+        else
+        {
+            // Just ensure the button has the right event handlers
+            Button button = multiplayerButtonObj.GetComponent<Button>();
+            if (button != null && menuManager != null)
+            {
+                button.onClick.RemoveAllListeners();
+                button.onClick.AddListener(() => menuManager.LoadGameMode("Multiplayer"));
 
+                if (menuManager != null)
+                {
+                    menuManager.SetMultiplayerButton(button);
+                }
+            }
+        }
+
+        // Ensure multiplayer button is properly registered with menu manager
         if (menuManager != null && multiplayerButtonObj != null)
         {
             Button mpButton = multiplayerButtonObj.GetComponent<Button>();
@@ -212,10 +257,10 @@ public class MainMenuInitializer : MonoBehaviour
         {
 
             statsPanelController.UpdateValue(
-                "No reaction time yet",
+                "No tests taken yet",
                 "");
 
-            statsPanelController.UpdateValueTextDirectly("No reaction time yet");
+            statsPanelController.UpdateValueTextDirectly("No tests taken yet");
 
             Debug.Log("MainMenuInitializer: No cached reaction time data available");
         }
@@ -270,11 +315,11 @@ public class MainMenuInitializer : MonoBehaviour
 
                         if (!ReactionTimeManager.HasReactionTimeData())
                         {
-                            statsPanelController.UpdateValue("No reaction time yet", "");
+                            statsPanelController.UpdateValue("No tests taken yet", "");
 
-                            statsPanelController.UpdateValueTextDirectly("No reaction time yet");
+                            statsPanelController.UpdateValueTextDirectly("No tests taken yet");
 
-                            Debug.Log("MainMenuInitializer: Displaying 'No reaction time yet'");
+                            Debug.Log("MainMenuInitializer: Displaying 'No tests taken yet'");
                         }
                     }
                 });
@@ -291,18 +336,54 @@ public class MainMenuInitializer : MonoBehaviour
         if (navBarContainer == null || navButtonPrefab == null)
             return;
 
+        // Check if buttons already exist in the scene
+        Transform homeButtonTransform = null;
+        Transform profileButtonTransform = null;
+
+        // Look for existing buttons
         foreach (Transform child in navBarContainer)
         {
-            Destroy(child.gameObject);
+            TextMeshProUGUI labelText = child.GetComponentInChildren<TextMeshProUGUI>();
+            if (labelText != null)
+            {
+                if (labelText.text == "Home")
+                    homeButtonTransform = child;
+                else if (labelText.text == "Profile")
+                    profileButtonTransform = child;
+            }
         }
 
-        CreateNavButton("Home", homeIcon, true);
+        // Only create buttons if they don't already exist
+        if (homeButtonTransform == null)
+        {
+            CreateNavButton("Home", homeIcon, true);
+        }
+        else
+        {
+            // Set up the existing Home button
+            Button button = homeButtonTransform.GetComponent<Button>();
+            if (button != null && menuManager != null)
+            {
+                button.onClick.RemoveAllListeners();
+                button.onClick.AddListener(() => menuManager.SwitchTab("Home"));
+            }
+        }
 
-        CreateNavButton("Solo", soloIcon, false);
-
-        CreateNavButton("Multiplayer", multiplayerIcon, false);
-
-        CreateNavButton("Profile", profileIcon, false);
+        if (profileButtonTransform == null)
+        {
+            CreateNavButton("Profile", profileIcon, false);
+        }
+        else
+        {
+            // Set up the existing Profile button
+            Button button = profileButtonTransform.GetComponent<Button>();
+            if (button != null && menuManager != null)
+            {
+                button.onClick.RemoveAllListeners();
+                button.onClick.AddListener(() => menuManager.SwitchTab("Profile"));
+                menuManager.profileButton = button;
+            }
+        }
     }
 
     void SetupChallengePanel()
@@ -310,16 +391,32 @@ public class MainMenuInitializer : MonoBehaviour
         if (challengeContainer == null || challengePanelPrefab == null)
             return;
 
+        // Check if a challenge panel already exists
+        ChallengePanelController existingController = null;
         foreach (Transform child in challengeContainer)
         {
-            Destroy(child.gameObject);
+            ChallengePanelController controller = child.GetComponent<ChallengePanelController>();
+            if (controller != null)
+            {
+                existingController = controller;
+                break;
+            }
         }
 
-        GameObject challengePanel = Instantiate(challengePanelPrefab, challengeContainer);
-        ChallengePanelController challengeController = challengePanel.GetComponent<ChallengePanelController>();
-        if (challengeController != null)
+        // Only create a new panel if one doesn't already exist
+        if (existingController == null)
         {
-            challengeController.UpdateChallengeData(reactionTime);
+            GameObject challengePanel = Instantiate(challengePanelPrefab, challengeContainer);
+            ChallengePanelController challengeController = challengePanel.GetComponent<ChallengePanelController>();
+            if (challengeController != null)
+            {
+                challengeController.UpdateChallengeData(reactionTime);
+            }
+        }
+        else
+        {
+            // Just update the existing panel's data
+            existingController.UpdateChallengeData(reactionTime);
         }
     }
 
@@ -328,21 +425,44 @@ public class MainMenuInitializer : MonoBehaviour
         if (profilePanelPrefab == null || canvasTransform == null)
             return;
 
-        GameObject profilePanel = Instantiate(profilePanelPrefab, canvasTransform);
-
-        TextMeshProUGUI emailText = profilePanel.transform.Find("Content/EmailText")?.GetComponent<TextMeshProUGUI>();
-        TMP_Dropdown professionDropdown = profilePanel.transform.Find("Content/ProfessionDropdown")?.GetComponent<TMP_Dropdown>();
-        Button saveButton = profilePanel.transform.Find("Buttons/SaveButton")?.GetComponent<Button>();
-
-        if (menuManager != null)
+        // Check if profile panel already exists
+        GameObject existingProfilePanel = GameObject.Find("ProfilePanel");
+        if (existingProfilePanel == null)
         {
-            menuManager.profilePanel = profilePanel;
-            menuManager.emailText = emailText;
-            menuManager.professionDropdown = professionDropdown;
-            menuManager.saveProfileButton = saveButton;
-        }
+            // Only create a new panel if one doesn't exist
+            GameObject profilePanel = Instantiate(profilePanelPrefab, canvasTransform);
 
-        profilePanel.SetActive(false);
+            TextMeshProUGUI emailText = profilePanel.transform.Find("Content/EmailText")?.GetComponent<TextMeshProUGUI>();
+            TMP_Dropdown professionDropdown = profilePanel.transform.Find("Content/ProfessionDropdown")?.GetComponent<TMP_Dropdown>();
+            Button saveButton = profilePanel.transform.Find("Buttons/SaveButton")?.GetComponent<Button>();
+
+            if (menuManager != null)
+            {
+                menuManager.profilePanel = profilePanel;
+                menuManager.emailText = emailText;
+                menuManager.professionDropdown = professionDropdown;
+                menuManager.saveProfileButton = saveButton;
+            }
+
+            profilePanel.SetActive(false);
+        }
+        else if (menuManager != null)
+        {
+            // Just ensure the existing panel is properly connected to menu manager
+            menuManager.profilePanel = existingProfilePanel;
+
+            // Connect existing UI elements if needed
+            if (menuManager.emailText == null)
+                menuManager.emailText = existingProfilePanel.transform.Find("Content/EmailText")?.GetComponent<TextMeshProUGUI>();
+
+            if (menuManager.professionDropdown == null)
+                menuManager.professionDropdown = existingProfilePanel.transform.Find("Content/ProfessionDropdown")?.GetComponent<TMP_Dropdown>();
+
+            if (menuManager.saveProfileButton == null)
+                menuManager.saveProfileButton = existingProfilePanel.transform.Find("Buttons/SaveButton")?.GetComponent<Button>();
+
+            existingProfilePanel.SetActive(false);
+        }
     }
 
     private void ConfigureModeButton(GameObject buttonObj, ModeType modeType, string modeName, string description, Sprite icon)
@@ -355,7 +475,7 @@ public class MainMenuInitializer : MonoBehaviour
         }
     }
 
-    private void CreateNavButton(string name, Sprite icon, bool isActive)
+    void CreateNavButton(string name, Sprite icon, bool isActive)
     {
         GameObject buttonObj = Instantiate(navButtonPrefab, navBarContainer);
         Button button = buttonObj.GetComponent<Button>();
@@ -370,15 +490,6 @@ public class MainMenuInitializer : MonoBehaviour
         if (labelText != null)
         {
             labelText.text = name;
-        }
-
-        if (isActive)
-        {
-            if (iconImage != null)
-                iconImage.color = new Color(0f, 0.8f, 1f);
-
-            if (labelText != null)
-                labelText.color = new Color(0f, 0.8f, 1f);
         }
 
         if (button != null && menuManager != null)

@@ -1,9 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using UnityEngine.Networking;
 using System.Collections;
-using System.Text;
 using UnityEngine.SceneManagement;
 
 public class RegisterManager : MonoBehaviour
@@ -41,34 +39,29 @@ public class RegisterManager : MonoBehaviour
         string url = "http://localhost:3000/register";
 
         string jsonData = JsonUtility.ToJson(new AuthData(email, password));
-        UnityWebRequest request = new UnityWebRequest(url, "POST");
-        byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
 
-        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-        request.downloadHandler = new DownloadHandlerBuffer();
-        request.SetRequestHeader("Content-Type", "application/json");
-
-        yield return request.SendWebRequest();
-
-        if (request.result == UnityWebRequest.Result.Success)
+        yield return StartCoroutine(RESTClient.SendRequest(url, RESTClient.RequestType.POST, jsonData, response =>
         {
-            if (autoLoginAfterRegister)
+            if (response.IsSuccess)
             {
-                StartCoroutine(LoginAfterRegister(email, password));
+                if (autoLoginAfterRegister)
+                {
+                    StartCoroutine(LoginAfterRegister(email, password));
+                }
+                else
+                {
+                    loadingPanel.SetActive(false);
+                    registerPanel.SetActive(false);
+                    loginPanel.SetActive(true);
+                }
             }
             else
             {
                 loadingPanel.SetActive(false);
-                registerPanel.SetActive(false);
-                loginPanel.SetActive(true);
+                registerPanel.SetActive(true);
+                registerErrorText.text = "Registration failed: " + response.Text;
             }
-        }
-        else
-        {
-            loadingPanel.SetActive(false);
-            registerPanel.SetActive(true);
-            registerErrorText.text = "Registration failed: " + request.downloadHandler.text;
-        }
+        }));
     }
 
     private IEnumerator LoginAfterRegister(string email, string password)
@@ -76,29 +69,24 @@ public class RegisterManager : MonoBehaviour
         string url = "http://localhost:3000/login";
 
         string jsonData = JsonUtility.ToJson(new AuthData(email, password));
-        UnityWebRequest request = new UnityWebRequest(url, "POST");
-        byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
 
-        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-        request.downloadHandler = new DownloadHandlerBuffer();
-        request.SetRequestHeader("Content-Type", "application/json");
-
-        yield return request.SendWebRequest();
-
-        loadingPanel.SetActive(false);
-
-        if (request.result == UnityWebRequest.Result.Success)
+        yield return StartCoroutine(RESTClient.SendRequest(url, RESTClient.RequestType.POST, jsonData, response =>
         {
-            PlayerPrefs.SetString("UserEmail", email);
-            PlayerPrefs.Save();
+            loadingPanel.SetActive(false);
 
-            SceneManager.LoadScene(mainMenuSceneName);
-        }
-        else
-        {
-            registerPanel.SetActive(false);
-            loginPanel.SetActive(true);
-        }
+            if (response.IsSuccess)
+            {
+                PlayerPrefs.SetString("UserEmail", email);
+                PlayerPrefs.Save();
+
+                SceneManager.LoadScene(mainMenuSceneName);
+            }
+            else
+            {
+                registerPanel.SetActive(false);
+                loginPanel.SetActive(true);
+            }
+        }));
     }
 
     private void OnLoginLinkClicked()

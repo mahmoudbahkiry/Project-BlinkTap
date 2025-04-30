@@ -1,9 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using UnityEngine.Networking;
 using System.Collections;
-using System.Text;
 using UnityEngine.SceneManagement;
 
 public class LoginManager : MonoBehaviour
@@ -40,32 +38,28 @@ public class LoginManager : MonoBehaviour
         string url = "http://localhost:3000/login";
 
         string jsonData = JsonUtility.ToJson(new AuthData(email, password));
-        UnityWebRequest request = new UnityWebRequest(url, "POST");
-        byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
 
-        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-        request.downloadHandler = new DownloadHandlerBuffer();
-        request.SetRequestHeader("Content-Type", "application/json");
-
-        yield return request.SendWebRequest();
-
-        loadingPanel.SetActive(false);
-
-        if (request.result == UnityWebRequest.Result.Success)
+        yield return StartCoroutine(RESTClient.SendRequest(url, RESTClient.RequestType.POST, jsonData, response =>
         {
-            Debug.Log("Login success: " + request.downloadHandler.text);
+            loadingPanel.SetActive(false);
 
-            PlayerPrefs.SetString("UserEmail", email);
-            PlayerPrefs.Save();
+            if (response.IsSuccess)
+            {
+                Debug.Log("Login success: " + response.Text);
 
-            loginPanel.SetActive(false);
+                PlayerPrefs.SetString("UserEmail", email);
+                PlayerPrefs.Save();
 
-            SceneManager.LoadScene(mainMenuSceneName);
-        }
-        else
-        {
-            errorText.text = "Login failed: " + request.downloadHandler.text;
-        }
+                loginPanel.SetActive(false);
+
+                SceneManager.LoadScene(mainMenuSceneName);
+            }
+            else
+            {
+                loginPanel.SetActive(true);
+                errorText.text = "Login failed: " + response.Text;
+            }
+        }));
     }
 
     private void OnRegisterLinkClicked()

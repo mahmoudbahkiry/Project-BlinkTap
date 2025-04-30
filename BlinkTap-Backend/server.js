@@ -5,14 +5,12 @@ const admin = require('./firebase');
 const app = express();
 const port = 3000;
 
-// Enable CORS for all routes
 app.use(cors({
-  origin: '*', // Allow all origins
+  origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Parse JSON bodies
 app.use(express.json());
 
 const { initializeApp } = require('firebase/app');
@@ -26,10 +24,8 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 const auth = getAuth(firebaseApp);
 
-// Get Firestore instance
 const db = admin.firestore();
 
-// Initialize professions collection if it doesn't exist (just a check)
 const initializeFirestore = async () => {
   try {
     const collections = await db.listCollections();
@@ -37,7 +33,6 @@ const initializeFirestore = async () => {
     
     if (!collectionIds.includes('professions')) {
       console.log('Initializing professions collection');
-      // The collection will be created when the first document is added
     } else {
       console.log('Professions collection already exists');
     }
@@ -46,10 +41,8 @@ const initializeFirestore = async () => {
   }
 };
 
-// Run initialization on server start
 initializeFirestore();
 
-// Log all incoming requests
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
   if (req.method === 'POST' || req.method === 'PUT') {
@@ -81,7 +74,6 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Get user profile data
 app.get('/profile', async (req, res) => {
   const { email } = req.query;
   
@@ -93,17 +85,14 @@ app.get('/profile', async (req, res) => {
   console.log(`GET /profile - Looking up profile for email: ${email}`);
   
   try {
-    // Query Firestore to find user profile by email
     const professionsRef = db.collection('professions');
     const snapshot = await professionsRef.where('email', '==', email).get();
     
     if (snapshot.empty) {
-      // No profile found, return empty data
       console.log(`No profession found for email: ${email}`);
       return res.status(200).json({ email: email, profession: '' });
     }
     
-    // Return the first matching document (there should only be one)
     const userData = snapshot.docs[0].data();
     console.log(`Found profession for ${email}: ${userData.profession}`);
     res.status(200).json({ email: userData.email, profession: userData.profession || '' });
@@ -113,13 +102,11 @@ app.get('/profile', async (req, res) => {
   }
 });
 
-// Update or create user profile data
 app.post('/profile', async (req, res) => {
   console.log('Received POST /profile request');
   console.log('Headers:', req.headers);
   console.log('Body:', req.body);
   
-  // Check if the body is properly parsed
   if (!req.body || typeof req.body !== 'object') {
     console.error('Invalid request body format. Received:', req.body);
     return res.status(400).json({ error: 'Invalid request body format' });
@@ -140,7 +127,6 @@ app.post('/profile', async (req, res) => {
   console.log(`POST /profile - Received profile update: ${email}, profession: ${profession}`);
   
   try {
-    // Check if user profile already exists
     const professionsRef = db.collection('professions');
     console.log(`Querying Firestore for email: ${email}`);
     const snapshot = await professionsRef.where('email', '==', email).get();
@@ -148,7 +134,6 @@ app.post('/profile', async (req, res) => {
     let result;
     
     if (snapshot.empty) {
-      // Create new user profile
       console.log(`Creating new profession record for email: ${email}`);
       const docRef = await professionsRef.add({
         email: email,
@@ -159,7 +144,6 @@ app.post('/profile', async (req, res) => {
       console.log(`Created new profession record with ID: ${docRef.id}`);
       result = { message: 'Profile created successfully', id: docRef.id };
     } else {
-      // Update existing profile
       const userDoc = snapshot.docs[0];
       console.log(`Updating existing profession record with ID: ${userDoc.id}`);
       await userDoc.ref.update({
@@ -171,7 +155,6 @@ app.post('/profile', async (req, res) => {
       result = { message: 'Profile updated successfully', id: userDoc.id };
     }
     
-    // Verify the update was successful by fetching the data again
     const verifySnapshot = await professionsRef.where('email', '==', email).get();
     if (!verifySnapshot.empty) {
       const userData = verifySnapshot.docs[0].data();
@@ -186,7 +169,6 @@ app.post('/profile', async (req, res) => {
   }
 });
 
-// Add a DEBUG endpoint to check if the server is running
 app.get('/debug', (req, res) => {
   console.log('DEBUG endpoint called');
   res.status(200).json({ 
@@ -196,13 +178,11 @@ app.get('/debug', (req, res) => {
   });
 });
 
-// Add a simple echo endpoint for testing
 app.post('/debug/echo', (req, res) => {
   console.log('ECHO endpoint called');
   console.log('Request headers:', req.headers);
   console.log('Request body:', req.body);
   
-  // Echo back the request data
   res.status(200).json({
     status: 'ok',
     message: 'Echo response',
@@ -212,7 +192,6 @@ app.post('/debug/echo', (req, res) => {
   });
 });
 
-// New endpoint to handle score uploads
 app.post('/scores', async (req, res) => {
   console.log('Received POST /scores request');
   console.log('Headers:', req.headers);
@@ -238,15 +217,12 @@ app.post('/scores', async (req, res) => {
   console.log(`POST /scores - Received score: ${email}, average reaction time: ${averageReactionTime}ms, timestamp: ${timestamp}`);
   
   try {
-    // Get a reference to the scores collection and the user's document
     const scoresRef = db.collection('scores');
     const userScoreRef = scoresRef.doc(email);
     
-    // Get the current document or create it if it doesn't exist
     const doc = await userScoreRef.get();
     
     if (!doc.exists) {
-      // Create a new document for this user
       console.log(`Creating new scores document for user: ${email}`);
       
       await userScoreRef.set({
@@ -262,20 +238,16 @@ app.post('/scores', async (req, res) => {
       console.log(`Created new scores document for email: ${email}`);
       return res.status(200).json({ message: 'Score recorded successfully' });
     } else {
-      // Update existing document by adding new test result
       console.log(`Updating existing scores document for user: ${email}`);
       
-      // Get existing data
       const userData = doc.data();
       const testResults = userData.testResults || [];
       
-      // Add new test result
       testResults.push({
         averageReactionTime: averageReactionTime,
         timestamp: timestamp || admin.firestore.FieldValue.serverTimestamp()
       });
       
-      // Update the document
       await userScoreRef.update({
         testResults: testResults,
         updatedAt: admin.firestore.FieldValue.serverTimestamp()
@@ -291,7 +263,6 @@ app.post('/scores', async (req, res) => {
   }
 });
 
-// New endpoint to get the best (lowest) score for a user
 app.get('/best-score', async (req, res) => {
   const { email } = req.query;
   
@@ -303,20 +274,16 @@ app.get('/best-score', async (req, res) => {
   console.log(`GET /best-score - Looking up best score for email: ${email}`);
   
   try {
-    // Get a reference to the scores collection and the user's document
     const scoresRef = db.collection('scores');
     const userScoreRef = scoresRef.doc(email);
     
-    // Get the current document
     const doc = await userScoreRef.get();
     
     if (!doc.exists) {
-      // No scores found for this user
       console.log(`No scores found for email: ${email}`);
       return res.status(200).json({ bestScore: 0 });
     }
     
-    // Get user data and test results
     const userData = doc.data();
     const testResults = userData.testResults || [];
     
@@ -325,7 +292,6 @@ app.get('/best-score', async (req, res) => {
       return res.status(200).json({ bestScore: 0 });
     }
     
-    // Find the lowest averageReactionTime
     let bestScore = Number.MAX_VALUE;
     for (const result of testResults) {
       if (result.averageReactionTime < bestScore) {
@@ -342,7 +308,6 @@ app.get('/best-score', async (req, res) => {
   }
 });
 
-// New endpoint to get the most recent reaction time for a user
 app.get('/most-recent-score', async (req, res) => {
   const { email } = req.query;
   
@@ -354,20 +319,16 @@ app.get('/most-recent-score', async (req, res) => {
   console.log(`GET /most-recent-score - Looking up most recent score for email: ${email}`);
   
   try {
-    // Get a reference to the scores collection and the user's document
     const scoresRef = db.collection('scores');
     const userScoreRef = scoresRef.doc(email);
     
-    // Get the current document
     const doc = await userScoreRef.get();
     
     if (!doc.exists) {
-      // No scores found for this user
       console.log(`No scores found for email: ${email}`);
       return res.status(200).json({ recentScore: 0 });
     }
     
-    // Get user data and test results
     const userData = doc.data();
     const testResults = userData.testResults || [];
     
@@ -376,8 +337,6 @@ app.get('/most-recent-score', async (req, res) => {
       return res.status(200).json({ recentScore: 0 });
     }
     
-    // Find the most recent test result by timestamp
-    // First try with actual timestamp objects
     let mostRecentResult = testResults[0];
     let mostRecentTimestamp = mostRecentResult.timestamp;
     
@@ -385,7 +344,6 @@ app.get('/most-recent-score', async (req, res) => {
       const result = testResults[i];
       const timestamp = result.timestamp;
       
-      // Convert string timestamps to Date objects for comparison if necessary
       const currentTimestamp = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
       const currentMostRecent = typeof mostRecentTimestamp === 'string' ? new Date(mostRecentTimestamp) : mostRecentTimestamp;
       
@@ -404,7 +362,6 @@ app.get('/most-recent-score', async (req, res) => {
   }
 });
 
-// Start the server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
