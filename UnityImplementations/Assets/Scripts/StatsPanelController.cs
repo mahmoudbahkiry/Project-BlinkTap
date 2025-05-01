@@ -167,7 +167,7 @@ public class StatsPanelController : MonoBehaviour
     {
         if (titleText != null)
         {
-            titleText.text = GetStatTitle();
+            titleText.text = "Last Reaction Time";
         }
 
         if (styler != null && !initialValuesStored)
@@ -209,23 +209,6 @@ public class StatsPanelController : MonoBehaviour
         else
         {
             Debug.LogWarning("StatsPanelController: changeText is null");
-        }
-    }
-
-    private string GetStatTitle()
-    {
-        switch (statsType)
-        {
-            case StatsType.ReactionTime:
-                return "Reaction Time";
-            case StatsType.GlobalRank:
-                return "Global Rank";
-            case StatsType.BestScore:
-                return "Best Score";
-            case StatsType.GamesPlayed:
-                return "Games Played";
-            default:
-                return "Stat";
         }
     }
 

@@ -12,6 +12,11 @@ public class ReactionTimeDisplay : MonoBehaviour
 
     private int lastReactionTime = 0;
 
+    void Start()
+    {
+        ResetLastReactionTimeDisplay();
+    }
+
     void Update()
     {
         if (ReactionTimeManager.Instance != null)
@@ -35,6 +40,19 @@ public class ReactionTimeDisplay : MonoBehaviour
                     lastReactionTimeText.text = $"Last: {allTimes[allTimes.Count - 1]} ms";
                 }
             }
+            else if (allTimes.Count == 0 && lastReactionTime > 0)
+            {
+                ResetLastReactionTimeDisplay();
+            }
+        }
+    }
+
+    public void ResetLastReactionTimeDisplay()
+    {
+        lastReactionTime = 0;
+        if (lastReactionTimeText != null)
+        {
+            lastReactionTimeText.text = "Last: 0 ms";
         }
     }
 }
