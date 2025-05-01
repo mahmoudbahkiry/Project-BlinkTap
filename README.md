@@ -115,13 +115,13 @@ Before setting up the project, ensure you have the following installed:
 3. Set up Firebase:
 
    - Create a Firebase project in the Firebase Console
-   - Download the service account key and save it as `serviceAccountKey.json` in the root directory
+   - Download the service account key and save it as `firebaseKey.json` in the root directory
    - Update Firebase configuration in `firebase.js` file
 
 4. Start the server:
 
    ```
-   npm start
+   node server.js
    ```
 
    The server will run on port 3000 by default.
