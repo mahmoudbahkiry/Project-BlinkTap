@@ -513,30 +513,6 @@ public class ProfilePanelController : MonoBehaviour
             titleText.color = Color.white;
         }
 
-        Transform emailLabelTransform = transform.Find("Content/EmailLabel");
-        if (emailLabelTransform != null)
-        {
-            TextMeshProUGUI emailLabel = emailLabelTransform.GetComponent<TextMeshProUGUI>();
-            if (emailLabel != null)
-            {
-                emailLabel.text = "Email:";
-                emailLabel.fontSize = 18;
-                emailLabel.color = new Color(0.7f, 0.7f, 0.7f);
-            }
-        }
-
-        Transform professionLabelTransform = transform.Find("Content/ProfessionLabel");
-        if (professionLabelTransform != null)
-        {
-            TextMeshProUGUI professionLabel = professionLabelTransform.GetComponent<TextMeshProUGUI>();
-            if (professionLabel != null)
-            {
-                professionLabel.text = "Profession:";
-                professionLabel.fontSize = 18;
-                professionLabel.color = new Color(0.7f, 0.7f, 0.7f);
-            }
-        }
-
         if (saveButton != null)
         {
             Image saveButtonImage = saveButton.GetComponent<Image>();
