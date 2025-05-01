@@ -60,10 +60,19 @@ public class ReactionTimeManager : MonoBehaviour
         if (reactionTimes.Count > 0)
         {
             float avgTime = AverageReactionTime;
-            PlayerPrefs.SetFloat(LAST_REACTION_TIME_KEY, avgTime);
-            PlayerPrefs.SetInt(HAS_REACTION_TIME_DATA_KEY, 1);
-            PlayerPrefs.Save();
-            Debug.Log($"Saved average reaction time to PlayerPrefs: {avgTime}ms");
+
+            string userEmail = PlayerPrefs.GetString("UserEmail", "");
+            if (!string.IsNullOrEmpty(userEmail))
+            {
+                PlayerPrefs.SetFloat(LAST_REACTION_TIME_KEY, avgTime);
+                PlayerPrefs.SetInt(HAS_REACTION_TIME_DATA_KEY, 1);
+                PlayerPrefs.Save();
+                Debug.Log($"Saved average reaction time to PlayerPrefs for user {userEmail}: {avgTime}ms");
+            }
+            else
+            {
+                Debug.LogWarning("Cannot save reaction time - no user email found");
+            }
         }
     }
 

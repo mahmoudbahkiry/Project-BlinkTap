@@ -143,11 +143,9 @@ public class MainMenuInitializer : MonoBehaviour
         if (gameModeContainer == null || soloModeButtonPrefab == null || multiplayerModeButtonPrefab == null)
             return;
 
-        // Check if buttons already exist in the scene
         GameObject soloButtonObj = null;
         GameObject multiplayerButtonObj = null;
 
-        // Look for existing buttons
         foreach (Transform child in gameModeContainer)
         {
             ModeButtonController controller = child.GetComponent<ModeButtonController>();
@@ -160,7 +158,6 @@ public class MainMenuInitializer : MonoBehaviour
             }
         }
 
-        // Only create buttons if they don't already exist
         if (soloButtonObj == null)
         {
             soloButtonObj = Instantiate(soloModeButtonPrefab, gameModeContainer);
@@ -173,7 +170,6 @@ public class MainMenuInitializer : MonoBehaviour
         }
         else
         {
-            // Just ensure the button has the right event handlers
             Button button = soloButtonObj.GetComponent<Button>();
             if (button != null && menuManager != null)
             {
@@ -194,7 +190,6 @@ public class MainMenuInitializer : MonoBehaviour
         }
         else
         {
-            // Just ensure the button has the right event handlers
             Button button = multiplayerButtonObj.GetComponent<Button>();
             if (button != null && menuManager != null)
             {
@@ -208,7 +203,6 @@ public class MainMenuInitializer : MonoBehaviour
             }
         }
 
-        // Ensure multiplayer button is properly registered with menu manager
         if (menuManager != null && multiplayerButtonObj != null)
         {
             Button mpButton = multiplayerButtonObj.GetComponent<Button>();
@@ -223,6 +217,20 @@ public class MainMenuInitializer : MonoBehaviour
     {
         if (statsContainer == null)
             return;
+
+        string currentUserEmail = PlayerPrefs.GetString("UserEmail", "");
+        string lastUserEmail = PlayerPrefs.GetString("LastLoadedUserForStats", "");
+
+        if (string.IsNullOrEmpty(lastUserEmail) || currentUserEmail != lastUserEmail)
+        {
+            Debug.Log($"MainMenuInitializer: User changed from {lastUserEmail} to {currentUserEmail}, clearing cached reaction time data");
+
+            PlayerPrefs.SetString("LastLoadedUserForStats", currentUserEmail);
+
+            PlayerPrefs.DeleteKey(ReactionTimeManager.LAST_REACTION_TIME_KEY);
+            PlayerPrefs.DeleteKey(ReactionTimeManager.HAS_REACTION_TIME_DATA_KEY);
+            PlayerPrefs.Save();
+        }
 
         Transform existingPanelTransform = statsContainer.Find("ReactionTimePanel");
         if (existingPanelTransform == null)
@@ -336,11 +344,9 @@ public class MainMenuInitializer : MonoBehaviour
         if (navBarContainer == null || navButtonPrefab == null)
             return;
 
-        // Check if buttons already exist in the scene
         Transform homeButtonTransform = null;
         Transform profileButtonTransform = null;
 
-        // Look for existing buttons
         foreach (Transform child in navBarContainer)
         {
             TextMeshProUGUI labelText = child.GetComponentInChildren<TextMeshProUGUI>();
@@ -353,14 +359,12 @@ public class MainMenuInitializer : MonoBehaviour
             }
         }
 
-        // Only create buttons if they don't already exist
         if (homeButtonTransform == null)
         {
             CreateNavButton("Home", homeIcon, true);
         }
         else
         {
-            // Set up the existing Home button
             Button button = homeButtonTransform.GetComponent<Button>();
             if (button != null && menuManager != null)
             {
@@ -375,7 +379,6 @@ public class MainMenuInitializer : MonoBehaviour
         }
         else
         {
-            // Set up the existing Profile button
             Button button = profileButtonTransform.GetComponent<Button>();
             if (button != null && menuManager != null)
             {
@@ -391,7 +394,6 @@ public class MainMenuInitializer : MonoBehaviour
         if (challengeContainer == null || challengePanelPrefab == null)
             return;
 
-        // Check if a challenge panel already exists
         ChallengePanelController existingController = null;
         foreach (Transform child in challengeContainer)
         {
@@ -403,7 +405,6 @@ public class MainMenuInitializer : MonoBehaviour
             }
         }
 
-        // Only create a new panel if one doesn't already exist
         if (existingController == null)
         {
             GameObject challengePanel = Instantiate(challengePanelPrefab, challengeContainer);
@@ -415,7 +416,6 @@ public class MainMenuInitializer : MonoBehaviour
         }
         else
         {
-            // Just update the existing panel's data
             existingController.UpdateChallengeData(reactionTime);
         }
     }
@@ -425,11 +425,9 @@ public class MainMenuInitializer : MonoBehaviour
         if (profilePanelPrefab == null || canvasTransform == null)
             return;
 
-        // Check if profile panel already exists
         GameObject existingProfilePanel = GameObject.Find("ProfilePanel");
         if (existingProfilePanel == null)
         {
-            // Only create a new panel if one doesn't exist
             GameObject profilePanel = Instantiate(profilePanelPrefab, canvasTransform);
 
             TextMeshProUGUI emailText = profilePanel.transform.Find("Content/EmailText")?.GetComponent<TextMeshProUGUI>();
@@ -448,10 +446,8 @@ public class MainMenuInitializer : MonoBehaviour
         }
         else if (menuManager != null)
         {
-            // Just ensure the existing panel is properly connected to menu manager
             menuManager.profilePanel = existingProfilePanel;
 
-            // Connect existing UI elements if needed
             if (menuManager.emailText == null)
                 menuManager.emailText = existingProfilePanel.transform.Find("Content/EmailText")?.GetComponent<TextMeshProUGUI>();
 

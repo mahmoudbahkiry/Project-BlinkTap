@@ -165,13 +165,24 @@ public class FirebaseManager : MonoBehaviour
                     {
                         recentTime = scoreResponse.recentScore;
 
-                        PlayerPrefs.SetFloat(ReactionTimeManager.LAST_REACTION_TIME_KEY, recentTime);
-                        PlayerPrefs.SetInt(ReactionTimeManager.HAS_REACTION_TIME_DATA_KEY, 1);
-                        PlayerPrefs.Save();
+                        string currentUserEmail = PlayerPrefs.GetString("UserEmail", "");
+                        if (!string.IsNullOrEmpty(currentUserEmail) && currentUserEmail == userEmail)
+                        {
+                            PlayerPrefs.SetFloat(ReactionTimeManager.LAST_REACTION_TIME_KEY, recentTime);
+                            PlayerPrefs.SetInt(ReactionTimeManager.HAS_REACTION_TIME_DATA_KEY, 1);
+                            PlayerPrefs.Save();
+
+                            Debug.Log($"FirebaseManager: Saved reaction time {recentTime}ms for user {currentUserEmail}");
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"FirebaseManager: Not saving reaction time locally - current user ({currentUserEmail}) doesn't match requested user ({userEmail})");
+                        }
                     }
                 }
                 catch (Exception e)
                 {
+                    Debug.LogError($"FirebaseManager: Error parsing recent score response: {e.Message}");
                 }
             }
 

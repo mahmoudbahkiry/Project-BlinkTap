@@ -353,7 +353,6 @@ public class ProfilePanelController : MonoBehaviour
                         Debug.Log("Profile data saved successfully");
                         ShowFeedback("Profile updated successfully!", true);
 
-                        // Verify the data was saved correctly
                         StartCoroutine(VerifyProfileSaved(profession));
                     }
                     else

@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using UnityEngine.Networking;
 
 public class LoginManager : MonoBehaviour
 {
@@ -48,6 +49,9 @@ public class LoginManager : MonoBehaviour
                 Debug.Log("Login success: " + response.Text);
 
                 PlayerPrefs.SetString("UserEmail", email);
+
+                PlayerPrefs.DeleteKey(ReactionTimeManager.LAST_REACTION_TIME_KEY);
+                PlayerPrefs.DeleteKey(ReactionTimeManager.HAS_REACTION_TIME_DATA_KEY);
                 PlayerPrefs.Save();
 
                 loginPanel.SetActive(false);

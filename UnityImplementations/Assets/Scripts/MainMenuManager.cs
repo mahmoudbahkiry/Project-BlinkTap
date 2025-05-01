@@ -382,20 +382,17 @@ public class MainMenuManager : MonoBehaviour
                 break;
         }
 
-        // Restore the call to maintain tab switching functionality
         UpdateNavButtonAppearance();
     }
 
     void UpdateNavButtonAppearance()
     {
-        // Modified to only set the active state but not change colors
-        // This will make it respect the colors set in the editor
+
         if (homeButton != null)
         {
             TextMeshProUGUI buttonText = homeButton.GetComponentInChildren<TextMeshProUGUI>();
             if (buttonText != null)
             {
-                // Keep current color (from editor) but update the font style
                 buttonText.fontStyle = currentTab == "Home" ? FontStyles.Bold : FontStyles.Normal;
             }
         }
@@ -405,7 +402,6 @@ public class MainMenuManager : MonoBehaviour
             TextMeshProUGUI buttonText = soloNavButton.GetComponentInChildren<TextMeshProUGUI>();
             if (buttonText != null)
             {
-                // Keep current color (from editor) but update the font style
                 buttonText.fontStyle = currentTab == "Solo" ? FontStyles.Bold : FontStyles.Normal;
             }
         }
@@ -415,7 +411,6 @@ public class MainMenuManager : MonoBehaviour
             TextMeshProUGUI buttonText = multiplayerNavButton.GetComponentInChildren<TextMeshProUGUI>();
             if (buttonText != null)
             {
-                // Keep current color (from editor) but update the font style
                 buttonText.fontStyle = currentTab == "Multiplayer" ? FontStyles.Bold : FontStyles.Normal;
             }
         }
@@ -425,7 +420,6 @@ public class MainMenuManager : MonoBehaviour
             TextMeshProUGUI buttonText = profileButton.GetComponentInChildren<TextMeshProUGUI>();
             if (buttonText != null)
             {
-                // Keep current color (from editor) but update the font style
                 buttonText.fontStyle = currentTab == "Profile" ? FontStyles.Bold : FontStyles.Normal;
             }
         }
